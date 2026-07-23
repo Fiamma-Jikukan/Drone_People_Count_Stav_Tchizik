@@ -9,5 +9,8 @@ sahi>=0.11.0           # Slicing-Aided Hyper Inference for small objects; MIT
 opencv-python>=4.8.0
 numpy>=1.24
 
+# Annotation tool (interactive point annotator: ground_truth/annotate_points.py)
+matplotlib>=3.7
+
 # Tests
 pytest>=7.4

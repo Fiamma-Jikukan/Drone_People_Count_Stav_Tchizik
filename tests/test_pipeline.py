@@ -25,6 +25,12 @@ from src.filtering import filter_confidence, filter_detections, iou, nms
 from src.counting import count_people
 from src.annotation import draw_detections, save_annotated_image
 from src.outputs import build_result, save_json
+from ground_truth import (
+    build_ground_truth,
+    load_ground_truth,
+    load_ground_truth_dir,
+    save_ground_truth,
+)
 
 
 # --------------------------------------------------------------------------
@@ -307,3 +313,58 @@ def test_save_json_roundtrip(tmp_path):
     path = save_json(result, tmp_path / "sub" / "a.json")
     assert path.is_file()
     assert json.loads(path.read_text(encoding="utf-8")) == result
+
+
+# --------------------------------------------------------------------------
+# Ground truth (item #4)
+# --------------------------------------------------------------------------
+
+def test_build_ground_truth_derives_count_and_rounds_points():
+    record = build_ground_truth("a_V.JPG", "rgb", [(10.4, 20.6), (30, 40)])
+    assert record == {
+        "image_name": "a_V.JPG",
+        "modality": "rgb",
+        "people_count": 2,
+        "points": [[10, 21], [30, 40]],  # rounded to int pixels
+    }
+
+
+def test_build_ground_truth_empty_is_zero():
+    record = build_ground_truth("a_T.JPG", "thermal", [])
+    assert record["people_count"] == 0
+    assert record["points"] == []
+
+
+def test_ground_truth_save_and_load_roundtrip(tmp_path):
+    record = build_ground_truth("a_V.JPG", "rgb", [(1, 2), (3, 4), (5, 6)])
+    path = save_ground_truth(record, tmp_path / "gt" / "a_V.json")
+    assert path.is_file()
+    assert load_ground_truth(path) == record
+
+
+def test_load_ground_truth_count_mismatch_raises(tmp_path):
+    bad = {"image_name": "x.JPG", "modality": "rgb", "people_count": 5, "points": [[1, 2]]}
+    path = tmp_path / "x.json"
+    path.write_text(json.dumps(bad), encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_ground_truth(path)
+
+
+def test_load_ground_truth_missing_key_raises(tmp_path):
+    bad = {"image_name": "x.JPG", "modality": "rgb", "points": []}  # no people_count
+    path = tmp_path / "x.json"
+    path.write_text(json.dumps(bad), encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_ground_truth(path)
+
+
+def test_load_ground_truth_dir_sorted(tmp_path):
+    save_ground_truth(build_ground_truth("b_V.JPG", "rgb", [(1, 1)]), tmp_path / "b_V.json")
+    save_ground_truth(build_ground_truth("a_T.JPG", "thermal", []), tmp_path / "a_T.json")
+    records = load_ground_truth_dir(tmp_path)
+    assert [r["image_name"] for r in records] == ["a_T.JPG", "b_V.JPG"]
+
+
+def test_load_ground_truth_dir_missing_raises(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        load_ground_truth_dir(tmp_path / "nope")

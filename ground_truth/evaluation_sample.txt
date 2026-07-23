@@ -1,0 +1,10 @@
+# Evaluation sample for item #4 (4 pairs = 8 images), paths relative to repo root.
+# Chosen to span sparse -> dense scenes across both modalities.
+input_images/DJI_20260621190747_0004_T.JPG
+input_images/DJI_20260621190747_0004_V.JPG
+input_images/DJI_20260621190803_0006_T.JPG
+input_images/DJI_20260621190803_0006_V.JPG
+input_images/DJI_20260621190900_0005_T.JPG
+input_images/DJI_20260621190900_0005_V.JPG
+input_images/DJI_20260621190910_0006_T.JPG
+input_images/DJI_20260621190910_0006_V.JPG
