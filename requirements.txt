@@ -1,0 +1,13 @@
+# Person counting in RGB and thermal drone images — dependencies.
+# (json / csv / pathlib / argparse / logging are in the Python standard library.)
+
+# Detection stack (see answers_documents/2_model_research_and_selection.md)
+ultralytics>=8.3.0     # YOLO11 detector (pulls in torch, torchvision); AGPL-3.0
+sahi>=0.11.0           # Slicing-Aided Hyper Inference for small objects; MIT
+
+# Image / numeric
+opencv-python>=4.8.0
+numpy>=1.24
+
+# Tests
+pytest>=7.4
