@@ -15,7 +15,6 @@ runs/
 
 # Regenerable ground-truth overlays (the JSON annotations ARE committed)
 ground_truth/review/
-ground_truth/render/
 
 # OS
 .DS_Store
