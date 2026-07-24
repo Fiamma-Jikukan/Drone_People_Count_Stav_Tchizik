@@ -31,6 +31,15 @@ from ground_truth import (
     load_ground_truth_dir,
     save_ground_truth,
 )
+from evaluation import (
+    aggregate,
+    aggregate_by_modality,
+    evaluate,
+    image_report,
+    match,
+    point_in_box,
+    precision_recall_f1,
+)
 
 
 # --------------------------------------------------------------------------
@@ -368,3 +377,130 @@ def test_load_ground_truth_dir_sorted(tmp_path):
 def test_load_ground_truth_dir_missing_raises(tmp_path):
     with pytest.raises(FileNotFoundError):
         load_ground_truth_dir(tmp_path / "nope")
+
+
+# --------------------------------------------------------------------------
+# Evaluation metrics (item #5)
+# --------------------------------------------------------------------------
+
+def _gt(image_name, modality, points):
+    """A ground-truth record."""
+    return {"image_name": image_name, "modality": modality, "people_count": len(points), "points": points}
+
+
+def _pred(image_name, modality, detections):
+    """A prediction record."""
+    return {"image_name": image_name, "modality": modality, "people_count": len(detections), "detections": detections}
+
+
+# --- point_in_box ---
+
+def test_point_in_box_inside_and_outside():
+    assert point_in_box([5, 5], [0, 0, 10, 10]) is True
+    assert point_in_box([15, 5], [0, 0, 10, 10]) is False
+
+
+def test_point_in_box_edges_inclusive():
+    assert point_in_box([0, 0], [0, 0, 10, 10]) is True
+    assert point_in_box([10, 10], [0, 0, 10, 10]) is True
+
+
+# --- match ---
+
+def test_match_box_over_two_points_is_one_tp_one_fn():
+    # One box covering two points can only claim one of them.
+    m = match([[4, 5], [6, 5]], [_box_det(0, 0, 10, 10, 0.9)])
+    assert (m["tp"], m["fp"], m["fn"]) == (1, 0, 1)
+
+
+def test_match_two_boxes_one_point_higher_confidence_wins():
+    m = match([[5, 5]], [_box_det(0, 0, 10, 10, 0.4), _box_det(0, 0, 10, 10, 0.95)])
+    assert (m["tp"], m["fp"]) == (1, 1)
+    assert m["matches"] == [(1, 0)]      # the 0.95 detection (index 1) claims the point
+    assert m["fp_detections"] == [0]     # the 0.4 detection is the false positive
+
+
+def test_match_empty_box_is_false_positive():
+    m = match([], [_box_det(0, 0, 1, 1, 0.9)])
+    assert (m["tp"], m["fp"], m["fn"]) == (0, 1, 0)
+
+
+def test_match_lonely_point_is_false_negative():
+    m = match([[100, 100]], [_box_det(0, 0, 10, 10, 0.9)])
+    assert (m["tp"], m["fp"], m["fn"]) == (0, 1, 1)
+
+
+def test_match_empty_inputs():
+    m = match([], [])
+    assert (m["tp"], m["fp"], m["fn"]) == (0, 0, 0)
+
+
+# --- precision / recall / F1 ---
+
+def test_prf_normal_case():
+    precision, recall, f1 = precision_recall_f1(8, 2, 4)
+    assert precision == 0.8
+    assert round(recall, 4) == 0.6667
+    assert round(f1, 4) == 0.7273
+
+
+def test_prf_zero_division_guards():
+    assert precision_recall_f1(0, 0, 5) == (0.0, 0.0, 0.0)   # no detections
+    assert precision_recall_f1(0, 5, 0) == (0.0, 0.0, 0.0)   # no ground truth
+    assert precision_recall_f1(0, 0, 0) == (0.0, 0.0, 0.0)   # nothing at all
+
+
+# --- image_report ---
+
+def test_image_report_fields():
+    gt = _gt("a_V.JPG", "rgb", [[5, 5], [6, 6], [100, 100]])
+    pred = _pred("a_V.JPG", "rgb", [_box_det(0, 0, 10, 10, 0.9), _box_det(200, 200, 210, 210, 0.8)])
+    r = image_report(gt, pred)
+    assert (r["gt_count"], r["pred_count"], r["abs_error"]) == (3, 2, 1)
+    assert (r["tp"], r["fp"], r["fn"]) == (1, 1, 2)
+
+
+# --- aggregate ---
+
+def test_aggregate_mae_and_micro_scores():
+    reports = [
+        {"modality": "rgb", "gt_count": 10, "pred_count": 8, "abs_error": 2, "tp": 8, "fp": 0, "fn": 2},
+        {"modality": "rgb", "gt_count": 5, "pred_count": 9, "abs_error": 4, "tp": 5, "fp": 4, "fn": 0},
+    ]
+    a = aggregate(reports)
+    assert a["images"] == 2 and a["mae"] == 3.0
+    assert (a["tp"], a["fp"], a["fn"]) == (13, 4, 2)
+    assert round(a["precision"], 4) == round(13 / 17, 4)   # micro-averaged
+    assert round(a["recall"], 4) == round(13 / 15, 4)
+
+
+def test_aggregate_empty_is_zeros():
+    a = aggregate([])
+    assert a["images"] == 0 and a["mae"] == 0.0 and a["precision"] == 0.0
+
+
+def test_aggregate_by_modality_splits():
+    reports = [
+        {"modality": "rgb", "gt_count": 3, "pred_count": 3, "abs_error": 0, "tp": 3, "fp": 0, "fn": 0},
+        {"modality": "thermal", "gt_count": 4, "pred_count": 1, "abs_error": 3, "tp": 1, "fp": 0, "fn": 3},
+    ]
+    by = aggregate_by_modality(reports)
+    assert set(by) == {"rgb", "thermal"}
+    assert by["rgb"]["images"] == 1 and by["thermal"]["mae"] == 3.0
+
+
+# --- evaluate ---
+
+def test_evaluate_pairs_by_name_and_aggregates():
+    gt = [_gt("a_V.JPG", "rgb", [[5, 5]]), _gt("a_T.JPG", "thermal", [[5, 5]])]
+    pred = [_pred("a_V.JPG", "rgb", [_box_det(0, 0, 10, 10, 0.9)]), _pred("a_T.JPG", "thermal", [])]
+    res = evaluate(gt, pred)
+    assert len(res["per_image"]) == 2
+    assert res["by_modality"]["rgb"]["recall"] == 1.0     # the one RGB person was found
+    assert res["by_modality"]["thermal"]["recall"] == 0.0  # the one thermal person was missed
+
+
+def test_evaluate_missing_prediction_raises():
+    gt = [_gt("a_V.JPG", "rgb", [[5, 5]])]
+    with pytest.raises(KeyError):
+        evaluate(gt, [])
