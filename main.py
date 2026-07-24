@@ -117,7 +117,7 @@ def process_image(model, image_path, args):
     result = build_result(Path(image_path).name, modality, people)
     save_json(result, Path(args.output) / "json" / f"{stem}.json")
 
-    # Return the result so the caller can summarise.
+    # Return the result.
     return result
 
 
