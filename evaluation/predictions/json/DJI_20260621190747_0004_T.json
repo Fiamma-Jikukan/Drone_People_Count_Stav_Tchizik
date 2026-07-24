@@ -1,0 +1,277 @@
+{
+  "image_name": "DJI_20260621190747_0004_T.JPG",
+  "modality": "thermal",
+  "people_count": 27,
+  "detections": [
+    {
+      "bbox": [
+        444,
+        722,
+        478,
+        773
+      ],
+      "confidence": 0.7555,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        262,
+        674,
+        283,
+        729
+      ],
+      "confidence": 0.6952,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        417,
+        626,
+        448,
+        675
+      ],
+      "confidence": 0.6295,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        152,
+        698,
+        183,
+        742
+      ],
+      "confidence": 0.6034,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        185,
+        699,
+        217,
+        748
+      ],
+      "confidence": 0.5896,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        790,
+        453,
+        816,
+        495
+      ],
+      "confidence": 0.5346,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        244,
+        623,
+        270,
+        667
+      ],
+      "confidence": 0.5114,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        179,
+        769,
+        228,
+        820
+      ],
+      "confidence": 0.5052,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        464,
+        619,
+        485,
+        675
+      ],
+      "confidence": 0.5036,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        315,
+        599,
+        332,
+        643
+      ],
+      "confidence": 0.5035,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        42,
+        901,
+        79,
+        964
+      ],
+      "confidence": 0.4996,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        248,
+        682,
+        272,
+        740
+      ],
+      "confidence": 0.4897,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        398,
+        626,
+        425,
+        669
+      ],
+      "confidence": 0.4781,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        197,
+        602,
+        219,
+        645
+      ],
+      "confidence": 0.4448,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        263,
+        614,
+        287,
+        658
+      ],
+      "confidence": 0.3617,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        288,
+        706,
+        341,
+        755
+      ],
+      "confidence": 0.3314,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1091,
+        427,
+        1115,
+        471
+      ],
+      "confidence": 0.317,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        0,
+        571,
+        18,
+        616
+      ],
+      "confidence": 0.3032,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        73,
+        474,
+        106,
+        514
+      ],
+      "confidence": 0.2979,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        215,
+        624,
+        238,
+        660
+      ],
+      "confidence": 0.2933,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        275,
+        832,
+        326,
+        868
+      ],
+      "confidence": 0.2901,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        816,
+        460,
+        836,
+        495
+      ],
+      "confidence": 0.2757,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1025,
+        419,
+        1053,
+        452
+      ],
+      "confidence": 0.2486,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        550,
+        542,
+        569,
+        570
+      ],
+      "confidence": 0.2412,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        3,
+        471,
+        41,
+        514
+      ],
+      "confidence": 0.2381,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        748,
+        338,
+        767,
+        411
+      ],
+      "confidence": 0.2321,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        599,
+        557,
+        623,
+        596
+      ],
+      "confidence": 0.2047,
+      "class": "person"
+    }
+  ]
+}
