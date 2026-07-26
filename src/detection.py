@@ -19,7 +19,9 @@ inside the functions, so importing this module stays cheap.
 """
 
 # Model weights file; auto-downloaded by Ultralytics on first use.
-DEFAULT_WEIGHTS = "yolo11n.pt"
+# yolo11x = the accurate config used for all reported results (slow on CPU;
+# pass --weights yolo11n.pt for a fast out-of-the-box run).
+DEFAULT_WEIGHTS = "yolo11x.pt"
 # Inference device: "cpu", "cuda:0", or None to let the library choose.
 DEFAULT_DEVICE = "cpu"
 # Low detection floor; per-modality confidence thresholds are applied later.

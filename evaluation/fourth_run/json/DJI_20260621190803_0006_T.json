@@ -1,0 +1,157 @@
+{
+  "image_name": "DJI_20260621190803_0006_T.JPG",
+  "modality": "thermal",
+  "people_count": 15,
+  "detections": [
+    {
+      "bbox": [
+        32,
+        62,
+        64,
+        115
+      ],
+      "confidence": 0.5148,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        65,
+        77,
+        98,
+        129
+      ],
+      "confidence": 0.4607,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1,
+        0,
+        50,
+        33
+      ],
+      "confidence": 0.2695,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1,
+        0,
+        29,
+        28
+      ],
+      "confidence": 0.2049,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        107,
+        19,
+        165,
+        126
+      ],
+      "confidence": 0.1625,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        956,
+        902,
+        1013,
+        990
+      ],
+      "confidence": 0.1445,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        124,
+        25,
+        149,
+        77
+      ],
+      "confidence": 0.1038,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        117,
+        75,
+        161,
+        127
+      ],
+      "confidence": 0.0969,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        144,
+        34,
+        165,
+        70
+      ],
+      "confidence": 0.0783,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        111,
+        22,
+        135,
+        68
+      ],
+      "confidence": 0.0713,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        0,
+        0,
+        11,
+        21
+      ],
+      "confidence": 0.0558,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        142,
+        79,
+        161,
+        113
+      ],
+      "confidence": 0.0372,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        0,
+        49,
+        20,
+        105
+      ],
+      "confidence": 0.0336,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        123,
+        29,
+        165,
+        87
+      ],
+      "confidence": 0.0323,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        908,
+        84,
+        944,
+        152
+      ],
+      "confidence": 0.0303,
+      "class": "person"
+    }
+  ]
+}

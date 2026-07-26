@@ -14,10 +14,10 @@ thresholds, and validation) taken in the rest of the project.
 The `input_images/` folder contains **13 RGB + thermal pairs (26 images)** captured
 by a **DJI Mavic 3 Thermal (M4T)** drone. Modality is encoded in the file name:
 
-| Suffix | Modality | Resolution | Lens (35 mm-equiv) | Notes |
-|--------|----------|-----------|--------------------|-------|
-| `_V`   | RGB / visual | **4032 × 3024** (12 MP) | 24 mm (wide) | f/1.7, standard color sensor |
-| `_T`   | Thermal      | **1280 × 1024** (1.3 MP) | 52 mm (narrow) | f/1.0, `WhiteHot` palette, edge-sharpened |
+| Suffix | Modality | Resolution | Notes                                   |
+|--------|----------|-----------|-----------------------------------------|
+| `_V`   | RGB / visual | **4032 × 3024** (12 MP) | Standard color sensor, 3 channels.      |
+| `_T`   | Thermal      | **1280 × 1024** (1.3 MP) | `WhiteHot`, edge-sharpened, one channel |
 
 Extracted from EXIF, the same for every frame:
 

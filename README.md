@@ -47,8 +47,9 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Model weights (`yolo11n.pt` / `yolo11x.pt`) are **downloaded automatically** by
-Ultralytics on first use.
+The default weights are **`yolo11x.pt`** — the accurate config used for all reported
+results (slow on CPU). Pass `--weights yolo11n.pt` for a fast out-of-the-box run.
+Weights are **downloaded automatically** by Ultralytics on first use (yolo11x ≈ 110 MB).
 
 ## Usage
 
@@ -56,8 +57,8 @@ Ultralytics on first use.
 # Count people in a folder (modality inferred from the _V / _T file names)
 python main.py --input input_images
 
-# One image, a bigger model, custom output dir
-python main.py --input input_images/DJI_20260621190910_0006_V.JPG --weights yolo11x.pt -o outputs/run1
+# One image, the fast model, custom output dir
+python main.py --input input_images/DJI_20260621190910_0006_V.JPG --weights yolo11n.pt -o outputs/run1
 
 # Faster single-pass (no SAHI) and a tuned thermal threshold
 python main.py --input input_images --no-sahi --thermal-conf 0.15

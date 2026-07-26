@@ -33,7 +33,7 @@ from src.modality import infer_modality
 # Step 3: modality-specific preprocessing.
 from src.preprocessing import preprocess
 # Step 4: build the model and run detection (import its defaults too).
-from src.detection import DEFAULT_DEVICE, DEFAULT_WEIGHTS, detect, load_model
+from src.detection import DEFAULT_BASE_CONFIDENCE, DEFAULT_DEVICE, DEFAULT_WEIGHTS, detect, load_model
 # Step 5: keep only people.
 from src.person_filter import filter_person
 # Step 6: confidence + NMS filtering (import its default IoU too).
@@ -72,10 +72,15 @@ def parse_args(argv=None):
     parser.add_argument("--device", default=DEFAULT_DEVICE, help='Device, e.g. "cpu" or "cuda:0".')
     # Disable SAHI tiled inference (single-pass; faster, weaker on small people).
     parser.add_argument("--no-sahi", action="store_true", help="Disable SAHI tiled inference.")
+    # Disable CLAHE thermal preprocessing (for the CLAHE on/off ablation).
+    parser.add_argument("--no-clahe", action="store_true", help="Disable CLAHE thermal preprocessing.")
     # Per-modality confidence thresholds and NMS IoU (the main tuning knobs).
     parser.add_argument("--rgb-conf", type=float, default=DEFAULT_RGB_CONFIDENCE, help="RGB confidence threshold.")
     parser.add_argument("--thermal-conf", type=float, default=DEFAULT_THERMAL_CONFIDENCE, help="Thermal confidence threshold.")
     parser.add_argument("--nms-iou", type=float, default=DEFAULT_NMS_IOU, help="NMS IoU threshold.")
+    # Detection floor: the lowest score the model returns at all (below the per-modality
+    # thresholds). Lower it to capture weak detections for a confidence sweep.
+    parser.add_argument("--base-conf", type=float, default=DEFAULT_BASE_CONFIDENCE, help="Model detection floor.")
     # Parse and return the namespace.
     return parser.parse_args(argv)
 
@@ -96,8 +101,8 @@ def process_image(model, image_path, args):
     image = load_image(image_path)
     # Step 2: decide the modality (explicit override or file-name convention).
     modality = infer_modality(image_path, override=args.modality)
-    # Step 3: apply modality-specific preprocessing.
-    preprocessed = preprocess(image, modality)
+    # Step 3: apply modality-specific preprocessing (CLAHE on thermal unless --no-clahe).
+    preprocessed = preprocess(image, modality, apply_clahe=not args.no_clahe)
     # Step 4: run detection (SAHI tiled unless --no-sahi).
     raw = detect(model, preprocessed, use_sahi=not args.no_sahi)
     # Step 5: keep only detections classified as people.
@@ -144,7 +149,7 @@ def main(argv=None):
     logger.info("Found %d image(s); weights=%s sahi=%s -> %s",
                 len(images), args.weights, not args.no_sahi, args.output)
     # Load the detector once, before the loop (weights download on first use).
-    model = load_model(weights=args.weights, device=args.device)
+    model = load_model(weights=args.weights, device=args.device, base_confidence=args.base_conf)
 
     # Track results and failures across the run.
     results = []

@@ -1,0 +1,28 @@
+{
+  "by_modality": {
+    "thermal": {
+      "images": 4,
+      "gt_total": 160,
+      "pred_total": 283,
+      "mae": 39.25,
+      "tp": 127,
+      "fp": 156,
+      "fn": 33,
+      "precision": 0.44876325088339225,
+      "recall": 0.79375,
+      "f1": 0.5733634311512416
+    }
+  },
+  "overall": {
+    "images": 4,
+    "gt_total": 160,
+    "pred_total": 283,
+    "mae": 39.25,
+    "tp": 127,
+    "fp": 156,
+    "fn": 33,
+    "precision": 0.44876325088339225,
+    "recall": 0.79375,
+    "f1": 0.5733634311512416
+  }
+}

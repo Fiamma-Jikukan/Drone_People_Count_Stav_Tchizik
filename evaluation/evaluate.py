@@ -141,6 +141,10 @@ def main(argv=None):
     # Load ground truth and predictions.
     gt_records = load_ground_truth_dir(args.gt_dir)
     pred_records = load_predictions(args.pred_dir)
+    # Only score ground-truth images that have a prediction (supports subset runs,
+    # e.g. a thermal-only lower-floor experiment).
+    predicted = {p["image_name"] for p in pred_records}
+    gt_records = [g for g in gt_records if g["image_name"] in predicted]
     # Index both by image name for the example overlays.
     gt_by_name = {g["image_name"]: g for g in gt_records}
     pred_by_name = {p["image_name"]: p for p in pred_records}
