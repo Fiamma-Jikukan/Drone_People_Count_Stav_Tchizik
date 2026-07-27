@@ -32,7 +32,7 @@ load → identify modality (RGB/thermal) → preprocess → detect (YOLO11 + SAH
 | `main.py` | Entry point — runs the pipeline over an image or a directory. |
 | `src/` | The nine pipeline steps, one module each (`loading`, `modality`, `preprocessing`, `detection`, `person_filter`, `filtering`, `counting`, `annotation`, `outputs`). |
 | `ground_truth/` | Point-annotation tool + store + the evaluation sample's ground-truth JSON. |
-| `evaluation/` | Metrics, plotting, and the evaluation runner; results in `evaluation/results/`. |
+| `evaluation/` | Metrics, plotting, and the evaluation runner; results in `evaluation/first_run/results/`. |
 | `answers_documents/` | The written analysis (docs 1, 2, 4, 5, 6, 7). |
 | `tests/` | Model-free tests for the core logic (`python -m pytest`). |
 | `input_images/` | Provided RGB (`_V`) + thermal (`_T`) drone image pairs. |

@@ -1,0 +1,15 @@
+{
+  "input": "evaluation/eval_images",
+  "output": "evaluation/second_run",
+  "modality": null,
+  "weights": "yolo11x.pt",
+  "device": "cpu",
+  "no_sahi": false,
+  "no_clahe": true,
+  "clahe_clip": 2.0,
+  "clahe_tile": 8,
+  "rgb_conf": 0.25,
+  "thermal_conf": 0.2,
+  "nms_iou": 0.5,
+  "base_conf": 0.1
+}

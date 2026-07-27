@@ -23,7 +23,7 @@ hand-annotated ground truth and the required metrics (item #5). The result analy
   precision = TP/(TP+FP), recall = TP/(TP+FN), F1 = harmonic mean; and per image the
   counting error = |predicted − ground truth|, averaged into **MAE**.
 - Code: `evaluation/metrics.py` (matching + metrics), `evaluation/evaluate.py`
-  (runner), `evaluation/plots.py` (charts). Outputs live in `evaluation/results/`.
+  (runner), `evaluation/plots.py` (charts). Outputs live in `../evaluation/first_run/results/`.
 
 ---
 
@@ -49,13 +49,13 @@ hand-annotated ground truth and the required metrics (item #5). The result analy
 | **RGB**     | 4 | 263 | 241 | **5.50**  | **0.925** | **0.848** | **0.885** | 223 | 18 | 40 |
 | **Thermal** | 4 | 160 | 48  | **28.00** | **0.833** | **0.250** | **0.385** | 40 | 8 | 120 |
 
-Figures (in `evaluation/results/plots/`):
+Figures (in `../evaluation/first_run/results/plots/`):
 
-![Counts per image](../evaluation/results/plots/counts_per_image.png)
+![Counts per image](../evaluation/first_run/results/plots/counts_per_image.png)
 
-![Detection scores by modality](../evaluation/results/plots/detection_scores.png)
+![Detection scores by modality](../evaluation/first_run/results/plots/detection_scores.png)
 
-![MAE by modality](../evaluation/results/plots/mae.png)
+![MAE by modality](../evaluation/first_run/results/plots/mae.png)
 
 ### Metrics reported *with reason for omission*
 
@@ -70,11 +70,11 @@ Figures (in `evaluation/results/plots/`):
 
 ### False-positive / false-negative examples
 
-Per-image overlays are in `evaluation/results/examples/` (green = TP box,
+Per-image overlays are in `../evaluation/first_run/results/examples/` (green = TP box,
 red = FP box, blue = matched GT point, yellow = missed GT point). The thermal
 example below is representative — **41 missed vs 25 found, only 2 false positives**:
 
-![Thermal FP/FN example (0004_T)](../evaluation/results/examples/DJI_20260621190747_0004_T.png)
+![Thermal FP/FN example (0004_T)](../evaluation/first_run/results/examples/DJI_20260621190747_0004_T.png)
 
 - **False positives** (few): a warm blob or edge-sharpening artefact read as a
   person in thermal; occasional object in RGB. Precision stays high (0.83–0.93).

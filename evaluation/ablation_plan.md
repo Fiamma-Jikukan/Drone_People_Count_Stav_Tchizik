@@ -20,7 +20,7 @@ to answer questions the single run left open — starting with **"did CLAHE help
 
 ### Baseline (run 1, already done)
 YOLO11x, SAHI **on**, CLAHE **on**, confidence RGB 0.25 / thermal 0.20, NMS IoU 0.5 —
-outputs in `evaluation/predictions/`.
+outputs in `first_run/predictions/`.
 
 ### Planned experiments
 
@@ -60,7 +60,7 @@ python evaluation/evaluate.py --pred-dir evaluation/second_run/json --output eva
 ```
 
 Then compare `evaluation/second_run/results/summary.json` (CLAHE off) against
-`evaluation/results/summary.json` (CLAHE on), focusing on the **thermal** row.
+`first_run/results/summary.json` (CLAHE on), focusing on the **thermal** row.
 
 ---
 
@@ -79,110 +79,28 @@ Outputs land in `evaluation/second_run/json/` (for the metrics) and
 
 **Result (measured).** Removing CLAHE **improved** thermal (recall 0.25 → 0.32,
 F1 0.385 → 0.462, MAE 28 → 24.75) while RGB stayed **identical** (the control) — so
-CLAHE was mildly *hurting* thermal, and the confidence sweep below uses **CLAHE off**.
+CLAHE was mildly *hurting* thermal. The gain is small: even at its best thermal
+setting the pipeline stays far behind RGB, which points to **domain mismatch** (a
+COCO-pretrained detector on `WhiteHot` thermal) as the real ceiling, not contrast
+normalisation. CLAHE **off** is therefore the recommended thermal configuration.
 
 ---
 
-## Confidence sweep (third run)
+## Further experiments (not run here)
 
-**Why one run is enough.** Unlike CLAHE (a pre-detection step), the confidence
-threshold is applied *after* detection. So instead of re-running the model per
-threshold, we run it **once at a low floor** and re-apply higher thresholds to the
-saved detections. This is **exact**: both SAHI's tile merge and our NMS are greedy by
-descending score, so a detection can only be suppressed by a *higher*-scoring one —
-filtering the saved (already-merged) detections at any threshold T gives the identical
-result to running the whole pipeline at T. One run therefore covers the entire sweep.
+The confidence threshold, NMS IoU, and SAHI on/off are the remaining candidate
+factors from the table above. They are left as future work; the two scripts in this
+folder support them when needed:
 
-**Config.** Best settings so far — CLAHE **off**, SAHI **on**, `yolo11x` — run at a low
-confidence floor of **0.10** for both modalities, so the saved JSON contains every
-detection down to 0.10.
+- **`confidence_sweep.py`** — the confidence threshold is applied *after* detection,
+  so it can be swept **without re-running the model**: capture one run at a low
+  `--base-conf`, then re-apply higher thresholds to the saved detections. This is
+  **exact** because both SAHI's tile merge and our NMS are greedy by descending
+  score, so filtering the saved detections at any threshold T equals running the
+  whole pipeline at T.
+- **`clahe_sweep.py`** — CLAHE is *pre-detection*, so each clip/tile setting changes
+  the detector input and must be re-run; this runner loads the model once and loops
+  the grid (clip × tile, plus a CLAHE-off reference) over the thermal images.
 
-**Sweep.** Re-threshold the saved detections at **0.10, 0.15, 0.20, 0.25, 0.30, 0.35**
-(per modality) and recompute metrics.
-
-**What we measure / expect.** Precision / recall / F1 / MAE vs threshold, per modality.
-Raising the threshold should trade recall for precision. The key question: does
-**lowering the thermal threshold meaningfully recover recall**, or does thermal stay
-low — confirming the bottleneck is the model not firing at all (domain mismatch), not a
-threshold that is merely too strict?
-
-### Run command
-
-```bash
-python main.py --input evaluation/eval_images --output evaluation/third_run --weights yolo11x.pt --no-clahe --rgb-conf 0.10 --thermal-conf 0.10
-```
-
-This writes detections down to confidence **0.10** (CLAHE off) into
-`evaluation/third_run/json/`. Note the per-image counts in this run are **inflated** (a
-low floor keeps many weak detections) — that is expected; the sweep re-applies the real
-thresholds to these saved detections, with no further model runs.
-
----
-
-## CLAHE clip/tile sweep
-
-The CLAHE on/off test used only the default clip=2.0 / tile=8. This sweep asks whether a
-**different CLAHE setting** (gentler clip, coarser/finer grid) would beat "off" — i.e.
-whether CLAHE was inherently harmful or just badly parameterised.
-
-**Why a dedicated runner (not one main.py run per setting).** CLAHE is a *preprocessing*
-step, so each setting changes the detector input and must be re-run (unlike the
-confidence sweep, which re-thresholds cached detections). `evaluation/clahe_sweep.py`
-loads the model **once** and loops the grid over the 4 thermal images, so it is far
-cheaper than re-launching `main.py` per setting. Thermal-only (RGB is unaffected by CLAHE),
-at a **fixed** thermal confidence so CLAHE is the only variable.
-
-**Grid.** clip ∈ {1.0, 2.0, 4.0} × tile ∈ {4, 8, 16}, plus a CLAHE-**off** reference row.
-Consistency check: "off" should reproduce the CLAHE-off result and "clip=2.0 tile=8" the
-CLAHE-on baseline (both at the same threshold).
-
-`main.py` also gained `--clahe-clip` / `--clahe-tile` flags for ad-hoc single runs.
-
-### Run command
-
-```bash
-python evaluation/clahe_sweep.py
-```
-
-Writes `evaluation/clahe_sweep/clahe_sweep.csv` (per-setting thermal P / R / F1 / MAE) and
-prints the table. Defaults: `yolo11x`, thermal conf 0.20, NMS 0.5, the grid above.
-
-**Result (measured).** Thermal wants a much **lower** threshold: dropping thermal
-0.20 → 0.10 lifted recall 0.32 → 0.52, F1 0.46 → 0.61, and **halved MAE (24.75 → 11.75)**,
-while RGB was flat with an optimum around 0.20–0.25. Two consistency checks passed
-exactly (RGB @ 0.25 = baseline; thermal @ 0.20 = second_run), confirming the
-re-thresholding is exact. But thermal recall was **still climbing at the 0.10 edge**, and
-0.10 was the model's detection floor — hence the next run.
-
----
-
-## Lower thermal floor (fourth run)
-
-**Why.** Thermal recall had not plateaued at 0.10, and 0.10 was the model's
-**detection floor** (`base_confidence`), so anything weaker was never captured. This run
-lowers the floor to **0.03** to see whether more real thermal people are recoverable
-below 0.10 — and where precision finally collapses.
-
-**Scope.** **Thermal only** (RGB is settled at ~0.20–0.25), on the 4 thermal images in
-`evaluation/eval_images_thermal/`. CLAHE **off**, SAHI **on**, `yolo11x`. A new
-`--base-conf` flag sets the model's detection floor; `--thermal-conf 0.03` saves
-detections down to 0.03.
-
-**Sweep.** Re-threshold at **0.03, 0.05, 0.075, 0.10, 0.15, 0.20** and find where thermal
-F1 / MAE bottom out — the practical thermal operating point.
-
-### Run command
-
-```bash
-python main.py --input evaluation/eval_images_thermal --output evaluation/fourth_run --weights yolo11x.pt --no-clahe --base-conf 0.03 --thermal-conf 0.03
-```
-
-Then, after the run — compute the metrics, then the threshold sweep:
-
-```bash
-# Metrics + FP/FN examples (scored at the 0.03 floor)
-python evaluation/evaluate.py --pred-dir evaluation/fourth_run/json --output evaluation/fourth_run/results
-
-# Threshold sweep (the main analysis for this run)
-python evaluation/confidence_sweep.py --pred-dir evaluation/fourth_run/json --output evaluation/fourth_run/sweep --thresholds 0.03 0.05 0.075 0.10 0.15 0.20
-```
+`main.py` also carries `--rgb-conf` / `--thermal-conf`, `--nms-iou`, `--no-sahi`,
+`--base-conf`, and `--clahe-clip` / `--clahe-tile` for ad-hoc single runs.

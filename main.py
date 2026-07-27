@@ -21,6 +21,8 @@ Examples:
 
 # argparse: parse command-line arguments.
 import argparse
+# json: record the run configuration for reproducibility / plot subtitles.
+import json
 # logging: progress and summary messages.
 import logging
 # pathlib.Path: build output paths from image names.
@@ -94,6 +96,18 @@ def confidence_for(modality, rgb_conf, thermal_conf):
     return thermal_conf if modality == "thermal" else rgb_conf
 
 
+def write_run_config(args):
+    """Record all run parameters as run_config.json in the output dir.
+
+    Used for reproducibility and to caption the evaluation charts with the exact
+    configuration that produced the predictions.
+    """
+    out = Path(args.output)
+    out.mkdir(parents=True, exist_ok=True)
+    with open(out / "run_config.json", "w", encoding="utf-8") as handle:
+        json.dump(vars(args), handle, indent=2)
+
+
 def process_image(model, image_path, args):
     """Run the nine pipeline steps on one image and write its outputs.
 
@@ -149,6 +163,8 @@ def main(argv=None):
         logger.error("No supported images found under: %s", args.input)
         return 1
 
+    # Record the full run configuration (for reproducibility + plot subtitles).
+    write_run_config(args)
     # Announce the run configuration.
     logger.info("Found %d image(s); weights=%s sahi=%s -> %s",
                 len(images), args.weights, not args.no_sahi, args.output)

@@ -157,8 +157,12 @@ def main(argv=None):
     reports = sorted(results["per_image"], key=lambda r: (r["modality"], r["image_name"]))
     write_per_image_csv(reports, out / "metrics_per_image.csv")
     write_summary_json(results, out / "summary.json")
+    # Parameter subtitle for the charts, from the run's recorded config (if present).
+    config_path = Path(args.pred_dir).parent / "run_config.json"
+    run_config = json.loads(config_path.read_text(encoding="utf-8")) if config_path.is_file() else None
+    subtitle = plots.format_run_config(run_config)
     # Draw the result charts and the per-image FP/FN overlays.
-    plots.plot_all(results, out / "plots")
+    plots.plot_all(results, out / "plots", subtitle=subtitle)
     save_examples(results, gt_by_name, pred_by_name, args.images_dir, out / "examples")
 
     # Print a compact summary to the console.

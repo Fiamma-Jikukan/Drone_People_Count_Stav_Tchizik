@@ -97,6 +97,18 @@ predictions and ground truth are directly comparable:
 (`ground_truth/ground_truth.py::load_ground_truth`). Files live in `ground_truth/`,
 one per image, named by the image stem.
 
+### Scripts in `ground_truth/`
+
+Everything ground-truth related lives in one package:
+
+| File | Purpose |
+|------|---------|
+| `ground_truth.py` | The ground-truth **store**: build / save / load the point records and validate them — `build_ground_truth`, `save_ground_truth`, `load_ground_truth` (checks `people_count == len(points)`), `load_ground_truth_dir`. |
+| `annotate_points.py` | Interactive **point annotator** (matplotlib) that produces the JSON, plus a headless `--review` overlay (detailed below). |
+| `render_annotations.py` | Standalone **renderer** that draws saved points as high-visibility ring markers onto the images for review / presentation — clearer than the annotator's small `--review` dots (detailed below). |
+| `__init__.py` | Package init; re-exports the store functions so callers write `from ground_truth import load_ground_truth, …`. |
+| `evaluation_sample.txt` | Manifest listing the 8 evaluation images (read by the tools; not a script). |
+
 ### Annotation tool
 
 `ground_truth/annotate_points.py` is a small interactive annotator (matplotlib):
@@ -112,6 +124,21 @@ one per image, named by the image stem.
 
 The tool reuses the pipeline's `load_image`, `infer_modality`, and
 `save_annotated_image` helpers.
+
+### Renderer
+
+`ground_truth/render_annotations.py` reads the saved ground-truth JSON and draws each
+point as a clear **hollow ring** (dark contrast outline, optional index number) onto the
+image — easier to verify than the annotator's small `--review` dots, and useful for the
+results package.
+
+- **Render all:** `python ground_truth/render_annotations.py` → writes overlays to
+  `ground_truth/render/`.
+- **Options:** `--input` (a JSON file or directory; default `ground_truth/`),
+  `--images-dir` (default `input_images`), `--output` (default `ground_truth/render`),
+  `--number` (index each marker), `--radius` (marker size).
+
+It reuses `load_image`, `load_ground_truth`, and `save_annotated_image`.
 
 ---
 

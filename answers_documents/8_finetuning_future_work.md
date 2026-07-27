@@ -14,23 +14,24 @@ concrete **plan** for doing it later.
 
 We deliberately did **not** fine-tune. Fine-tuning updates the model's weights by
 training on labelled data (learning rate, epochs, batch size, …) and produces a new
-model — distinct from the inference/preprocessing **ablation** we ran (CLAHE, confidence,
-NMS), which never changed a single weight. The decision rests on evidence:
+model — distinct from the inference/preprocessing **ablation** we ran (CLAHE on/off),
+which never changed a single weight. The decision rests on evidence:
 
 - **No training data.** The 8 hand-annotated images are an **evaluation** set, and the
   ground truth is **points** (for counting), not training boxes. Training on 8 images —
   one location, one dusk session — would **overfit** immediately and tell us nothing
   generalisable (doc 4).
 - **RGB is already strong** without training (F1 0.885, MAE 5.5) — no need.
-- **Cheap settings recovered most of the thermal gap first.** The ablation showed that
-  turning CLAHE off and lowering the thermal threshold cut thermal MAE **~4×**
-  (28 → 7.5) with **no training at all** (ablation_results.md). The correct engineering
-  order is: exhaust free settings, *then* train — and we did.
-- **But the ablation also located the ceiling that only training can lift.** Thermal
-  precision collapses when we push recall (domain mismatch: the COCO model has never
-  seen `WhiteHot` thermal — docs 1, 6). Thresholds cannot move that curve; **fine-tuning
-  is precisely the tool that can.** So fine-tuning is the right *future* step, targeted
-  specifically at **thermal**.
+- **Exhaust the free settings first.** The ablation showed that turning CLAHE off gives
+  a small thermal improvement (MAE 28 → 24.75, F1 0.385 → 0.462) with **no training at
+  all** (ablation_results.md). The correct engineering order is: take the free settings
+  wins, *then* train — and we did.
+- **But the ablation also located the ceiling that only training can lift.** Even at its
+  best setting thermal stays far behind RGB, because the COCO-pretrained model has never
+  seen `WhiteHot` thermal and only weakly recognises the warm blobs as people (domain
+  mismatch — docs 1, 6). No preprocessing or threshold knob can move that curve;
+  **fine-tuning is precisely the tool that can.** So fine-tuning is the right *future*
+  step, targeted specifically at **thermal**.
 
 The choice of detector supports this: Ultralytics YOLO11 has a first-class fine-tuning
 API, so the plan below is low-friction when data exists (doc 2).
@@ -40,8 +41,9 @@ API, so the plan below is low-friction when data exists (doc 2).
 ## 8.2 When fine-tuning becomes justified (triggers)
 
 - A **labelled in-domain thermal training set** exists (aerial, `WhiteHot`, ~45 m).
-- Thermal performance must exceed the **settings-tuned ceiling** (thermal F1 ≈ 0.67,
-  MAE ≈ 7.5) — i.e. higher precision *and* recall together, which thresholds can't give.
+- Thermal performance must exceed the **current best settings** (CLAHE off: thermal
+  F1 ≈ 0.46, MAE ≈ 25) — i.e. higher precision *and* recall together, which no
+  preprocessing or threshold knob can give.
 - RGB does **not** need it; fine-tuning effort is thermal-only.
 
 ---

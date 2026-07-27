@@ -1,7 +1,7 @@
 """Confidence-threshold sweep (ablation, item #6).
 
-Takes one low-floor prediction run (e.g. ``evaluation/third_run``) and re-applies a
-range of confidence thresholds to the *saved* detections, recomputing the metrics at
+Takes one low-floor prediction run (a run captured with a low ``--base-conf``) and
+re-applies a range of confidence thresholds to the *saved* detections, recomputing the metrics at
 each — no further model runs. This is exact because SAHI's merge and our NMS are
 greedy by score (see evaluation/ablation_plan.md).
 
@@ -10,7 +10,7 @@ MAE vs threshold.
 
 Usage:
     python evaluation/confidence_sweep.py
-    python evaluation/confidence_sweep.py --pred-dir evaluation/third_run/json --output evaluation/third_run/sweep
+    python evaluation/confidence_sweep.py --pred-dir evaluation/second_run/json --output evaluation/second_run/sweep
 """
 
 # argparse / csv / json / sys / pathlib: CLI + record IO.
@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 # Reuse the ground-truth loader, metrics, and the shared plot style.
 from ground_truth import load_ground_truth_dir
 from evaluation.metrics import evaluate
-from evaluation.plots import MODALITY_COLOR, _save, _style
+from evaluation.plots import MODALITY_COLOR, _save, _style, _titles, format_run_config
 
 # Confidence thresholds to sweep.
 DEFAULT_THRESHOLDS = [0.10, 0.15, 0.20, 0.25, 0.30, 0.35]
@@ -82,9 +82,9 @@ def write_csv(rows, out_path):
     return path
 
 
-def plot_metric(rows, metric, ylabel, ylim, thresholds, out_path):
+def plot_metric(rows, metric, ylabel, ylim, thresholds, out_path, subtitle=""):
     """Line chart of one metric vs threshold, one line per modality."""
-    fig, ax = plt.subplots(figsize=(6.5, 4.5))
+    fig, ax = plt.subplots(figsize=(6.5, 4.7))
     for modality in ("rgb", "thermal"):
         series = [r for r in rows if r["modality"] == modality]
         if not series:
@@ -96,7 +96,8 @@ def plot_metric(rows, metric, ylabel, ylim, thresholds, out_path):
     ax.set_xlabel("confidence threshold")
     if ylim:
         ax.set_ylim(*ylim)
-    _style(ax, f"{ylabel} vs confidence threshold", ylabel)
+    _style(ax, ylabel)
+    _titles(fig, ax, f"{ylabel} vs confidence threshold", subtitle)
     ax.legend(frameon=False, fontsize=9)
     return _save(fig, out_path)
 
@@ -104,8 +105,8 @@ def plot_metric(rows, metric, ylabel, ylim, thresholds, out_path):
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description="Confidence-threshold sweep over saved predictions.")
     parser.add_argument("--gt-dir", default="ground_truth", help="Ground-truth JSON directory.")
-    parser.add_argument("--pred-dir", default="evaluation/third_run/json", help="Low-floor prediction JSON directory.")
-    parser.add_argument("--output", "-o", default="evaluation/third_run/sweep", help="Output directory.")
+    parser.add_argument("--pred-dir", default="evaluation/second_run/json", help="Low-floor prediction JSON directory.")
+    parser.add_argument("--output", "-o", default="evaluation/second_run/sweep", help="Output directory.")
     parser.add_argument("--thresholds", type=float, nargs="+", default=DEFAULT_THRESHOLDS, help="Thresholds to sweep.")
     return parser.parse_args(argv)
 
@@ -122,10 +123,15 @@ def main(argv=None):
     thresholds = sorted(args.thresholds)
     rows = run_sweep(gt_records, pred_records, thresholds)
 
+    # Parameter subtitle from the source run's recorded config (if present).
+    config_path = Path(args.pred_dir).parent / "run_config.json"
+    run_config = json.loads(config_path.read_text(encoding="utf-8")) if config_path.is_file() else None
+    subtitle = format_run_config(run_config)
+
     out = Path(args.output)
     write_csv(rows, out / "sweep.csv")
     for key, label, ylim in METRICS:
-        plot_metric(rows, key, label, ylim, thresholds, out / f"{key}_vs_threshold.png")
+        plot_metric(rows, key, label, ylim, thresholds, out / f"{key}_vs_threshold.png", subtitle=subtitle)
 
     # Print a compact table to the console.
     print(f"{'thr':>5} {'mod':<7} {'P':>6} {'R':>6} {'F1':>6} {'MAE':>7}")
