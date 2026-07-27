@@ -14,25 +14,11 @@ thresholds, and validation) taken in the rest of the project.
 The `input_images/` folder contains **13 RGB + thermal pairs (26 images)** captured
 by a **DJI Mavic 3 Thermal (M4T)** drone. Modality is encoded in the file name:
 
-| Suffix | Modality | Resolution | Notes                                   |
-|--------|----------|-----------|-----------------------------------------|
-| `_V`   | RGB / visual | **4032 × 3024** (12 MP) | Standard color sensor, 3 channels.      |
-| `_T`   | Thermal      | **1280 × 1024** (1.3 MP) | `WhiteHot`, edge-sharpened, one channel |
+| Suffix | Modality | Resolution | Notes                                    |
+|--------|----------|-----------|------------------------------------------|
+| `_V`   | RGB / visual | **4032 × 3024** (12 MP) | Standard color sensor, 3 channels.       |
+| `_T`   | Thermal      | **1280 × 1024** (1.3 MP) | `WhiteHot` palette (hotter = brighter), stylized/upscaled appearance, one channel |
 
-Extracted from EXIF, the same for every frame:
-
-- **Camera:** DJI M4T, both sensors on one gimbal.
-- **Altitude:** ≈ **45.7 m** above the launch point (AGL) — a fairly high nadir/oblique view.
-- **Capture time:** **2026-06-21, ~19:07 local** — summer **evening / low sun**, long shadows, sun glare off the sea.
-- **Scene:** a seaside promenade / grass park (Caesarea harbor) with people
-  sitting on picnic blankets in groups, walking on paths, and dining at café tables;
-  historic stone buildings, palm trees, and open sea in the background.
-- Each pair shares one timestamp, i.e. the two sensors fire **near-simultaneously**.
-
-This is a small, homogeneous set (one location, one session, one lighting
-condition). That shapes the whole approach: it is enough for a **meaningful
-evaluation sample** but far too small and non-diverse to train or fine-tune a
-detector on — a point that justifies using **pretrained** models (see doc 2).
 
 ---
 
@@ -42,7 +28,7 @@ detector on — a point that justifies using **pretrained** models (see doc 2).
 
 In the RGB frames a standing person is roughly **20–45 px tall** inside a
 4032 × 3024 image; seated people are smaller still. That is well under 1 % of the
-image height. At 45 m altitude with a 24 mm-equiv wide lens, each person occupies
+image height. Each person occupies
 only a few hundred pixels. Small objects:
 
 - carry very little texture/feature information for a detector,
@@ -74,11 +60,10 @@ The two modalities behave almost oppositely:
 - **Thermal** has 10× fewer pixels but people often appear as **bright warm
   blobs** that pop out of a cool background — good for detection of
   small targets, poor for classifying *what* the blob is.
-- The provided thermal is **not raw radiometric**: it is a `WhiteHot`, heavily
-  **edge-sharpened** 8-bit JPEG. The sharpening adds halo/edge clutter and the
+- The provided thermal is **not raw radiometric**: it is a `WhiteHot` 8-bit JPEG with a
+  strongly **stylized, edge-enhanced appearance**. Those artefacts add halo/edge clutter, and the
   camera's **automatic gain control (AGC) re-normalizes brightness per frame** —
-  so "hot = bright" is **not stable across frames** (in pair DJI_20260621190917_0007 the warm evening
-  pavement leaves people barely brighter than the ground). A fixed
+  so "hot = bright" is **not stable across frames**. A fixed
   brightness/threshold heuristic on thermal will therefore fail; a learned
   detector or per-frame normalization is required.
 
@@ -149,7 +134,7 @@ its **native 1280 × 1024** (upscaling adds no real detail and wastes compute).
   resolution/tiling, not pixel manipulation.
 - **Thermal:** convert single-channel to 3-channel for COCO-pretrained models;
   **per-frame normalization / CLAHE** to stabilize the AGC-driven brightness
-  differences seen between pairs DJI_20260621190710_0001 and DJI_20260621190917_0007.
+  differences.
 
 ### Confidence thresholds
 Set **independently per modality**, chosen on the annotated evaluation sample by
@@ -172,7 +157,7 @@ pretrained models over fitting to these 13 scenes.
 The defining conditions of this dataset are **very small people**, **dense seated
 clusters**, and **two unaligned sensors with opposite strengths** (RGB = detail but
 tiny/low-contrast targets; thermal = salient blobs but low resolution, unstable
-gain, and edge-sharpening artefacts), all under **low evening light with strong
+gain, and upscaling/processing artefacts), all under **low evening light with strong
 shadows and thermal clutter**. These push the design toward: a **pretrained
 small-object detector**, **high-resolution or tiled inference**, **modality-specific
 preprocessing and thresholds**, **careful NMS**, **per-image / per-modality

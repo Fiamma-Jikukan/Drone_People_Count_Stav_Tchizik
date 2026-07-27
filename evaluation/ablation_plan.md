@@ -117,6 +117,36 @@ This writes detections down to confidence **0.10** (CLAHE off) into
 low floor keeps many weak detections) — that is expected; the sweep re-applies the real
 thresholds to these saved detections, with no further model runs.
 
+---
+
+## CLAHE clip/tile sweep
+
+The CLAHE on/off test used only the default clip=2.0 / tile=8. This sweep asks whether a
+**different CLAHE setting** (gentler clip, coarser/finer grid) would beat "off" — i.e.
+whether CLAHE was inherently harmful or just badly parameterised.
+
+**Why a dedicated runner (not one main.py run per setting).** CLAHE is a *preprocessing*
+step, so each setting changes the detector input and must be re-run (unlike the
+confidence sweep, which re-thresholds cached detections). `evaluation/clahe_sweep.py`
+loads the model **once** and loops the grid over the 4 thermal images, so it is far
+cheaper than re-launching `main.py` per setting. Thermal-only (RGB is unaffected by CLAHE),
+at a **fixed** thermal confidence so CLAHE is the only variable.
+
+**Grid.** clip ∈ {1.0, 2.0, 4.0} × tile ∈ {4, 8, 16}, plus a CLAHE-**off** reference row.
+Consistency check: "off" should reproduce the CLAHE-off result and "clip=2.0 tile=8" the
+CLAHE-on baseline (both at the same threshold).
+
+`main.py` also gained `--clahe-clip` / `--clahe-tile` flags for ad-hoc single runs.
+
+### Run command
+
+```bash
+python evaluation/clahe_sweep.py
+```
+
+Writes `evaluation/clahe_sweep/clahe_sweep.csv` (per-setting thermal P / R / F1 / MAE) and
+prints the table. Defaults: `yolo11x`, thermal conf 0.20, NMS 0.5, the grid above.
+
 **Result (measured).** Thermal wants a much **lower** threshold: dropping thermal
 0.20 → 0.10 lifted recall 0.32 → 0.52, F1 0.46 → 0.61, and **halved MAE (24.75 → 11.75)**,
 while RGB was flat with an optimum around 0.20–0.25. Two consistency checks passed

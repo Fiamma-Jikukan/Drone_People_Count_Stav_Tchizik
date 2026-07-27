@@ -2,8 +2,7 @@
 
 After person filtering (step 5) and confidence/NMS filtering (step 6), the number
 of people in an image is simply the number of remaining detections. Giving this
-its own function keeps the pipeline readable and provides a single place to change
-the counting rule later (e.g. if counting ever needed weighting or grouping).
+its own function keeps the pipeline readable.
 
 One function: ``count_people``.
 """

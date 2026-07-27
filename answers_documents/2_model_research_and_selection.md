@@ -11,31 +11,7 @@ a **small single-condition dataset**, and a **~30-hour prototype** scope.
 
 ---
 
-## 2.1 Framing: paradigm first
-
-Before comparing detectors, one higher-level choice: **object detection (boxes)**
-vs. **density-map crowd counting** (a learned "people per region" heatmap, e.g.
-CSRNet / P2PNet).
-
-I use **object detection** and reject density estimation as the primary approach
-because:
-
-- The assignment explicitly requires **detection-level outputs** (bounding boxes
-  or points) for validation, duplicate reduction, and per-detection metrics
-  (precision/recall). Density maps give a number, not verifiable detections.
-- Our scenes are **moderately** dense (small seated groups), not the extreme
-  crowds density models are built for — detection is both feasible and more
-  informative here.
-- Pretrained density models are trained almost entirely on **RGB, ground-level,
-  head-annotated** data — a poor match for **aerial full-body thermal**.
-
-Density estimation is noted as a possible future direction for genuinely dense
-scenes. The two models compared below are therefore both **object detectors**,
-chosen to represent the two dominant modern detector families.
-
----
-
-## 2.2 The two candidate models
+## 2.1 The two candidate models
 
 **Why these two.** Modern object detection is dominated by two model families, and
 these candidates are the strongest, best-supported representative of each. Rather
@@ -100,22 +76,27 @@ the pipeline is written to swap it in once validated.
 
 ---
 
-## 2.3 Comparison against the required criteria
+## 2.2 Comparison against the required criteria
 
 ### (a) Suitability for small-object detection in aerial imagery
 
-- **YOLO11 + SAHI:** **Strong.** A single 640-px pass on a 4032×3024 image shrinks a
-  30-px person to ~5 px and recall collapses (the failure doc 1 predicts). Slicing
-  the image into overlapping ~640-px tiles restores near-native scale per person,
-  then merges detections back — SAHI was built for exactly this and reports large
-  small-object recall gains.
-- **RT-DETR/RF-DETR:** **Good** by architecture (attention captures small objects
-  better than a plain single-pass CNN), and it can *also* be run under SAHI. But at
-  a tractable single-pass resolution it still under-resolves 30-px people, so in
-  practice it too needs tiling to compete here — removing its main edge.
+The binding constraint here is **resolution, not architecture**: a single 640-px pass on
+a 4032×3024 frame shrinks a 30-px person to ~5 px and recall collapses (the failure doc 1
+predicts). The fix is **tiled inference (SAHI)**, which is **model-agnostic** — so both
+candidates are assessed **with tiling**, like-for-like.
 
-*Roughly even once both are tiled; YOLO's tiling path is more mature and better
-documented.*
+- **YOLO11 + SAHI:** **Strong.** Slicing the image into overlapping ~640-px tiles
+  restores near-native scale per person, then merges detections back; SAHI was built for
+  exactly this and reports large small-object recall gains.
+- **RT-DETR / RF-DETR + SAHI:** **Comparable.** Its attention / multi-scale design gives
+  a genuine small-object edge *in principle*, but that edge is largely neutralised once
+  both are tiled — tiling already makes each person large within its tile. Run tiled, it
+  is on par with YOLO on this criterion.
+
+*Verdict: **even** once both are tiled; YOLO's SAHI integration is simply more mature and
+better documented. Note this criterion is **analytical** — only YOLO+SAHI was actually
+run (RT-DETR was not benchmarked), so parity is a reasoned expectation, not a measured
+result; a tiled head-to-head on the evaluation set would confirm it.*
 
 ### (b) Suitability for RGB and thermal input
 
@@ -126,7 +107,7 @@ documented.*
 - This is a **preprocessing** decision, so it applies **equally** to both models.
   Expect **lower thermal recall** than RGB from either COCO-pretrained model, to be
   quantified in evaluation and, if needed, closed later by **fine-tuning on a
-  thermal set** (see 2.5).
+  thermal set** (see doc 8).
 
 *Even.*
 
@@ -197,7 +178,7 @@ documented.*
 
 ---
 
-## 2.4 Selected approach
+## 2.3 Selected approach
 
 **Primary implementation: Ultralytics YOLO11, COCO-pretrained, run with SAHI
 sliced/tiled inference, applied to both modalities** (thermal replicated to

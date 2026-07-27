@@ -128,7 +128,7 @@ def _detect_sahi(
         slice_width=slice_width,
         overlap_height_ratio=overlap_height_ratio,
         overlap_width_ratio=overlap_width_ratio,
-        verbose=0,
+        verbose=1,
     )
 
     # Convert each SAHI object prediction into our detection dict.
@@ -155,7 +155,7 @@ def _detect_single_pass(model, image_bgr, imgsz):
         image_bgr[..., ::-1],
         imgsz=imgsz,
         conf=model.confidence_threshold,
-        verbose=False,
+        verbose=True,
     )
 
     # Convert Ultralytics boxes into our detection dicts.

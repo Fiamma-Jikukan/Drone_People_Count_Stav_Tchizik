@@ -30,8 +30,8 @@ from pathlib import Path
 from src.loading import discover_images, load_image
 # Step 2: decide RGB vs thermal.
 from src.modality import infer_modality
-# Step 3: modality-specific preprocessing.
-from src.preprocessing import preprocess
+# Step 3: modality-specific preprocessing (import its CLAHE defaults too).
+from src.preprocessing import CLAHE_CLIP_LIMIT, CLAHE_TILE_GRID, preprocess
 # Step 4: build the model and run detection (import its defaults too).
 from src.detection import DEFAULT_BASE_CONFIDENCE, DEFAULT_DEVICE, DEFAULT_WEIGHTS, detect, load_model
 # Step 5: keep only people.
@@ -74,6 +74,9 @@ def parse_args(argv=None):
     parser.add_argument("--no-sahi", action="store_true", help="Disable SAHI tiled inference.")
     # Disable CLAHE thermal preprocessing (for the CLAHE on/off ablation).
     parser.add_argument("--no-clahe", action="store_true", help="Disable CLAHE thermal preprocessing.")
+    # CLAHE parameters (thermal), for the clip/tile ablation.
+    parser.add_argument("--clahe-clip", type=float, default=CLAHE_CLIP_LIMIT, help="CLAHE clip limit (thermal).")
+    parser.add_argument("--clahe-tile", type=int, default=CLAHE_TILE_GRID, help="CLAHE tile grid N for NxN (thermal).")
     # Per-modality confidence thresholds and NMS IoU (the main tuning knobs).
     parser.add_argument("--rgb-conf", type=float, default=DEFAULT_RGB_CONFIDENCE, help="RGB confidence threshold.")
     parser.add_argument("--thermal-conf", type=float, default=DEFAULT_THERMAL_CONFIDENCE, help="Thermal confidence threshold.")
@@ -102,7 +105,8 @@ def process_image(model, image_path, args):
     # Step 2: decide the modality (explicit override or file-name convention).
     modality = infer_modality(image_path, override=args.modality)
     # Step 3: apply modality-specific preprocessing (CLAHE on thermal unless --no-clahe).
-    preprocessed = preprocess(image, modality, apply_clahe=not args.no_clahe)
+    preprocessed = preprocess(image, modality, apply_clahe=not args.no_clahe,
+                              clahe_clip_limit=args.clahe_clip, clahe_tile_grid=args.clahe_tile)
     # Step 4: run detection (SAHI tiled unless --no-sahi).
     raw = detect(model, preprocessed, use_sahi=not args.no_sahi)
     # Step 5: keep only detections classified as people.

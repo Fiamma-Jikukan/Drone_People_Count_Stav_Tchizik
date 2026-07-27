@@ -50,8 +50,7 @@ image resolution.
 
 Trade-off: points give per-image counts and precision/recall but **not** IoU-based
 `mAP@0.5` (which needs boxes). `mAP` is an optional metric, so this is an accepted
-limitation; if box-level metrics become necessary, a subset could later be
-re-annotated with boxes.
+limitation.
 
 ---
 
@@ -89,7 +88,7 @@ predictions and ground truth are directly comparable:
 {
   "image_name": "DJI_20260621190910_0006_V.JPG",
   "modality": "rgb",
-  "people_count": 102,
+  "people_count": 100,
   "points": [[x, y], [x, y], ...]
 }
 ```
