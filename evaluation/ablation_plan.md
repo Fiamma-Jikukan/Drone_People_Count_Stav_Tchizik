@@ -86,11 +86,31 @@ normalisation. CLAHE **off** is therefore the recommended thermal configuration.
 
 ---
 
+## CLAHE clip/tile sweep (run)
+
+The on/off test used only the default CLAHE (clip 2.0, tile 8). To check whether a
+*different* CLAHE setting could beat "off" — i.e. whether CLAHE was inherently harmful
+or just badly parameterised — `clahe_sweep.py` re-runs thermal detection across the
+full **clip × tile grid**. CLAHE is *pre-detection*, so each setting changes the
+detector input and must be re-run; the runner loads the model once and loops the grid
+(clip {1, 2, 4} × tile {4, 8, 16}, plus a CLAHE-off reference) over the thermal images,
+at a fixed thermal conf 0.20 / NMS 0.5 so CLAHE is the only variable.
+
+```bash
+python evaluation/clahe_sweep.py
+```
+
+**Result.** **No CLAHE setting beat off** — the full table and consistency checks are
+in [ablation_results.md](ablation_results.md) §3. This makes the "CLAHE off" decision
+robust to parameterisation, not an artefact of one setting.
+
+---
+
 ## Further experiments (not run here)
 
 The confidence threshold, NMS IoU, and SAHI on/off are the remaining candidate
-factors from the table above. They are left as future work; the two scripts in this
-folder support them when needed:
+factors from the table above. They are left as future work; `confidence_sweep.py`
+supports the first when needed:
 
 - **`confidence_sweep.py`** — the confidence threshold is applied *after* detection,
   so it can be swept **without re-running the model**: capture one run at a low
@@ -98,9 +118,6 @@ folder support them when needed:
   **exact** because both SAHI's tile merge and our NMS are greedy by descending
   score, so filtering the saved detections at any threshold T equals running the
   whole pipeline at T.
-- **`clahe_sweep.py`** — CLAHE is *pre-detection*, so each clip/tile setting changes
-  the detector input and must be re-run; this runner loads the model once and loops
-  the grid (clip × tile, plus a CLAHE-off reference) over the thermal images.
 
 `main.py` also carries `--rgb-conf` / `--thermal-conf`, `--nms-iou`, `--no-sahi`,
 `--base-conf`, and `--clahe-clip` / `--clahe-tile` for ad-hoc single runs.
