@@ -32,8 +32,8 @@ load → identify modality (RGB/thermal) → preprocess → detect (YOLO11 + SAH
 | `main.py` | Entry point — runs the pipeline over an image or a directory. |
 | `src/` | The nine pipeline steps, one module each (`loading`, `modality`, `preprocessing`, `detection`, `person_filter`, `filtering`, `counting`, `annotation`, `outputs`). |
 | `ground_truth/` | Point-annotation tool + store + the evaluation sample's ground-truth JSON. |
-| `evaluation/` | Metrics, plotting, and the evaluation runner; results in `evaluation/first_run/results/`. |
-| `answers_documents/` | The written analysis (docs 1, 2, 4, 5, 6, 7). |
+| `evaluation/` | Metrics, plotting, evaluation runner, and the ablation (`ablation_results.md`, runs 1–3); baseline results in `evaluation/first_run/results/`. |
+| `answers_documents/` | The written analysis (docs 1–8). |
 | `tests/` | Model-free tests for the core logic (`python -m pytest`). |
 | `input_images/` | Provided RGB (`_V`) + thermal (`_T`) drone image pairs. |
 
@@ -97,6 +97,7 @@ alternative and the pipeline is written detector-agnostic. Full comparison:
 
 - **RGB:** near pass-through (SAHI resolution does the work).
 - **Thermal:** grayscale → **CLAHE** (to stabilise per-frame auto-gain) → 3-channel.
+  *(Kept on by default as the baseline; the ablation found CLAHE mildly hurts thermal — see Results.)*
 - **SAHI tiling:** 640-px tiles, 0.2 overlap.
 - **Post-processing:** keep `person` class → per-modality confidence
   (**RGB 0.25 / thermal 0.20**) → **NMS IoU 0.5** → count.
@@ -112,7 +113,9 @@ and `|pred − GT|` → MAE. Details:
 [doc 4](answers_documents/4_ground_truth_and_evaluation_sample.md),
 [doc 5](answers_documents/5_evaluation_and_analysis.md).
 
-## Results (YOLO11x, default thresholds)
+## Results
+
+**Baseline** (shipped defaults — YOLO11x, CLAHE on, RGB 0.25 / thermal 0.20):
 
 | Modality | MAE | Precision | Recall | F1 |
 |----------|----:|----------:|-------:|---:|
@@ -121,17 +124,34 @@ and `|pred − GT|` → MAE. Details:
 
 **RGB is strong; thermal is weak** — driven by *missed* people (recall), not false
 alarms. The COCO-pretrained detector has never seen `WhiteHot` thermal, so warm human
-blobs don't match its learned "person" appearance. Full analysis and the
-RGB-vs-thermal comparison:
+blobs don't match its learned "person" appearance.
+
+**Ablation** (runs 1–3) shows most of the thermal weakness is a threshold/preprocessing
+artefact, not the model failing to fire. Turning **CLAHE off** and lowering the **thermal
+threshold to 0.10** roughly **halves thermal counting error**; RGB is unaffected:
+
+| Modality | MAE | Precision | Recall | F1 |
+|----------|----:|----------:|-------:|---:|
+| **RGB** (0.25) | 5.5 | 0.925 | 0.848 | 0.885 |
+| **Thermal** (CLAHE off, 0.10) | **11.75** | 0.735 | 0.519 | **0.608** |
+
+The thermal model is **under-confident, not blind** (it fires on ~74 % of thermal people
+at a low threshold), but **precision then caps F1 at ~0.67** — the durable fix is a
+thermal-appropriate model. The defaults ship conservative on purpose; the tuned operating
+point is documented, not baked in. Full analysis:
 [doc 5](answers_documents/5_evaluation_and_analysis.md),
 [doc 6](answers_documents/6_result_analysis.md),
-[doc 7](answers_documents/7_rgb_vs_thermal_comparison.md).
+[doc 7](answers_documents/7_rgb_vs_thermal_comparison.md),
+[`evaluation/ablation_results.md`](evaluation/ablation_results.md),
+[`evaluation/third_run/run3_analysis.md`](evaluation/third_run/run3_analysis.md).
 
 ## Known limitations and next steps
 
 - **Thermal needs a thermal-appropriate model** (fine-tune on FLIR/aerial thermal, or
-  a thermal-native detector); lowering the thermal confidence is a cheap mitigation.
-- **Quantitative ablation** of confidence / NMS / SAHI is a planned follow-up.
+  a thermal-native detector); lowering the thermal confidence to 0.10 is a **quantified**
+  cheap mitigation (≈ halves MAE), but precision is the ceiling.
+- **Quantitative ablation done** (runs 1–3): CLAHE clip/tile grid + confidence sweep +
+  operating-point run — see [`evaluation/ablation_results.md`](evaluation/ablation_results.md).
 - **Small, single-condition sample** (one location, one dusk session): results are
   indicative, not generalisable.
 - Fusion (RGB↔thermal via a fixed homography) is proposed but out of scope

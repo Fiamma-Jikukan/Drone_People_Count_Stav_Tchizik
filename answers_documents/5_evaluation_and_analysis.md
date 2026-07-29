@@ -76,7 +76,7 @@ example below is representative — **41 missed vs 25 found, only 2 false positi
 
 ![Thermal FP/FN example (0004_T)](../evaluation/first_run/results/examples/DJI_20260621190747_0004_T.png)
 
-- **False positives** (few): a warm blob or edge-sharpening artefact read as a
+- **False positives** (few): a warm blob or high-contrast edge artefact read as a
   person in thermal; occasional object in RGB. Precision stays high (0.83–0.93).
 - **False negatives** (many, especially thermal): small/low-contrast warm blobs and
   people in dense clusters that the COCO-pretrained model does not fire on.

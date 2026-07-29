@@ -6,7 +6,8 @@ Results of the two evaluation runs defined in [ablation_plan.md](ablation_plan.m
 plus a **CLAHE clip/tile grid sweep** (§3). The ablation quantifies the **effect of
 settings** (item #6): the CLAHE factor, evaluated against the same point ground truth
 with the same metrics, per modality. **Only the setting under test changes between the
-runs.**
+runs.** The **confidence-threshold** factor is covered separately by run 3 — see
+[`third_run/run3_analysis.md`](third_run/run3_analysis.md).
 
 ---
 
@@ -102,6 +103,6 @@ Table: `evaluation/clahe_sweep/clahe_sweep.csv`.
 - The measured effect is modest (a few points of thermal F1); it should be read as
   "CLAHE did not help here", not as a large tuning win.
 - The best *fix* for thermal remains a **thermal-appropriate model**, not preprocessing
-  (docs 6–7). The remaining candidate factors (confidence threshold, NMS IoU, SAHI
-  on/off) are left as future work — see [ablation_plan.md](ablation_plan.md) and the
-  `confidence_sweep.py` helper in this folder.
+  (docs 6–7). The **confidence threshold** was swept in run 3
+  ([`third_run/run3_analysis.md`](third_run/run3_analysis.md)); **NMS IoU** and **SAHI
+  on/off** remain future work — see [ablation_plan.md](ablation_plan.md).

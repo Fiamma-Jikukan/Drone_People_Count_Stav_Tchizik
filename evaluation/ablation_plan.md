@@ -106,18 +106,32 @@ robust to parameterisation, not an artefact of one setting.
 
 ---
 
+## Confidence sweep (run — run 3)
+
+The confidence threshold is applied *after* detection, so it can be swept **without
+re-running the model** per value: capture one run at a low `--base-conf`, then re-apply
+higher thresholds to the saved detections. This is **exact** because both SAHI's tile
+merge and our NMS are greedy by descending score, so filtering the saved detections at
+any threshold T equals running the whole pipeline at T.
+
+`confidence_sweep.py` was run on a **0.05-floor capture** (CLAHE off), then a
+baseline-faithful **operating-point run** at the recommended thresholds (RGB 0.25 /
+thermal 0.10) was scored for inspectable per-image results and FP/FN examples.
+
+```bash
+python main.py --input evaluation/eval_images --output evaluation/third_run --no-clahe --base-conf 0.05 --rgb-conf 0.05 --thermal-conf 0.05
+python evaluation/confidence_sweep.py --pred-dir evaluation/third_run/json --output evaluation/third_run/sweep --thresholds 0.05 0.075 0.10 0.15 0.20 0.25 0.30 0.35
+```
+
+**Result.** Thermal is **under-confident, not blind** — lowering thermal to ~0.10 roughly
+halves counting error. Full table, charts, operating-point evaluation, and caveats are in
+[`third_run/run3_analysis.md`](third_run/run3_analysis.md).
+
+---
+
 ## Further experiments (not run here)
 
-The confidence threshold, NMS IoU, and SAHI on/off are the remaining candidate
-factors from the table above. They are left as future work; `confidence_sweep.py`
-supports the first when needed:
-
-- **`confidence_sweep.py`** — the confidence threshold is applied *after* detection,
-  so it can be swept **without re-running the model**: capture one run at a low
-  `--base-conf`, then re-apply higher thresholds to the saved detections. This is
-  **exact** because both SAHI's tile merge and our NMS are greedy by descending
-  score, so filtering the saved detections at any threshold T equals running the
-  whole pipeline at T.
-
-`main.py` also carries `--rgb-conf` / `--thermal-conf`, `--nms-iou`, `--no-sahi`,
-`--base-conf`, and `--clahe-clip` / `--clahe-tile` for ad-hoc single runs.
+**NMS IoU** and **SAHI on/off** remain as candidate factors. They need model re-runs
+(both are applied before the JSON is saved, so neither can be swept post-hoc). `main.py`
+carries `--nms-iou`, `--no-sahi`, `--base-conf`, and `--clahe-clip` / `--clahe-tile` for
+ad-hoc single runs.

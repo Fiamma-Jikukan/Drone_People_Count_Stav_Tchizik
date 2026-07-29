@@ -1,0 +1,947 @@
+{
+  "image_name": "DJI_20260621190910_0006_T.JPG",
+  "modality": "thermal",
+  "people_count": 94,
+  "detections": [
+    {
+      "bbox": [
+        725,
+        556,
+        756,
+        607
+      ],
+      "confidence": 0.6044,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        392,
+        485,
+        408,
+        529
+      ],
+      "confidence": 0.5218,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        512,
+        391,
+        526,
+        432
+      ],
+      "confidence": 0.4935,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        868,
+        384,
+        886,
+        416
+      ],
+      "confidence": 0.477,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        912,
+        594,
+        949,
+        640
+      ],
+      "confidence": 0.471,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        491,
+        148,
+        505,
+        187
+      ],
+      "confidence": 0.4644,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        443,
+        412,
+        456,
+        450
+      ],
+      "confidence": 0.4037,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        871,
+        55,
+        882,
+        92
+      ],
+      "confidence": 0.4012,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        682,
+        450,
+        713,
+        485
+      ],
+      "confidence": 0.3987,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1058,
+        346,
+        1078,
+        401
+      ],
+      "confidence": 0.3835,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        650,
+        607,
+        696,
+        659
+      ],
+      "confidence": 0.3782,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        801,
+        455,
+        820,
+        495
+      ],
+      "confidence": 0.3761,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        738,
+        148,
+        752,
+        187
+      ],
+      "confidence": 0.3615,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        779,
+        566,
+        804,
+        616
+      ],
+      "confidence": 0.3607,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        641,
+        537,
+        668,
+        574
+      ],
+      "confidence": 0.325,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        760,
+        152,
+        774,
+        188
+      ],
+      "confidence": 0.325,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1175,
+        866,
+        1213,
+        924
+      ],
+      "confidence": 0.3203,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        985,
+        384,
+        1000,
+        418
+      ],
+      "confidence": 0.2873,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        856,
+        384,
+        871,
+        412
+      ],
+      "confidence": 0.2782,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        529,
+        743,
+        567,
+        788
+      ],
+      "confidence": 0.2751,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        851,
+        56,
+        870,
+        98
+      ],
+      "confidence": 0.2705,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1058,
+        384,
+        1074,
+        402
+      ],
+      "confidence": 0.2635,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        798,
+        58,
+        811,
+        93
+      ],
+      "confidence": 0.257,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        712,
+        458,
+        731,
+        486
+      ],
+      "confidence": 0.2271,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        796,
+        273,
+        816,
+        294
+      ],
+      "confidence": 0.2224,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        789,
+        519,
+        804,
+        550
+      ],
+      "confidence": 0.2213,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        863,
+        702,
+        892,
+        743
+      ],
+      "confidence": 0.2143,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        586,
+        689,
+        629,
+        802
+      ],
+      "confidence": 0.2094,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        747,
+        464,
+        772,
+        505
+      ],
+      "confidence": 0.2048,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        512,
+        720,
+        544,
+        786
+      ],
+      "confidence": 0.1986,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1025,
+        428,
+        1056,
+        464
+      ],
+      "confidence": 0.1953,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        916,
+        551,
+        938,
+        581
+      ],
+      "confidence": 0.1835,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        841,
+        56,
+        852,
+        90
+      ],
+      "confidence": 0.1734,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        761,
+        243,
+        786,
+        280
+      ],
+      "confidence": 0.1642,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        808,
+        179,
+        823,
+        202
+      ],
+      "confidence": 0.16,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        843,
+        165,
+        875,
+        199
+      ],
+      "confidence": 0.1582,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        673,
+        543,
+        702,
+        574
+      ],
+      "confidence": 0.1565,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        651,
+        538,
+        667,
+        562
+      ],
+      "confidence": 0.1553,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        823,
+        262,
+        838,
+        290
+      ],
+      "confidence": 0.1546,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        969,
+        65,
+        989,
+        106
+      ],
+      "confidence": 0.1523,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        295,
+        814,
+        338,
+        879
+      ],
+      "confidence": 0.1434,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        699,
+        476,
+        723,
+        503
+      ],
+      "confidence": 0.1414,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        759,
+        545,
+        800,
+        594
+      ],
+      "confidence": 0.1414,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        788,
+        360,
+        807,
+        388
+      ],
+      "confidence": 0.1405,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1089,
+        445,
+        1116,
+        477
+      ],
+      "confidence": 0.1404,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        958,
+        200,
+        977,
+        225
+      ],
+      "confidence": 0.1398,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        889,
+        571,
+        921,
+        617
+      ],
+      "confidence": 0.1326,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        878,
+        490,
+        908,
+        532
+      ],
+      "confidence": 0.1299,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        523,
+        720,
+        543,
+        748
+      ],
+      "confidence": 0.1264,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        530,
+        742,
+        574,
+        819
+      ],
+      "confidence": 0.1246,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        872,
+        167,
+        883,
+        192
+      ],
+      "confidence": 0.1219,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1077,
+        440,
+        1100,
+        481
+      ],
+      "confidence": 0.1209,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        804,
+        365,
+        826,
+        391
+      ],
+      "confidence": 0.1208,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        204,
+        241,
+        221,
+        268
+      ],
+      "confidence": 0.1102,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1180,
+        169,
+        1196,
+        211
+      ],
+      "confidence": 0.1088,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1163,
+        175,
+        1175,
+        211
+      ],
+      "confidence": 0.1064,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1075,
+        441,
+        1126,
+        490
+      ],
+      "confidence": 0.1037,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        820,
+        461,
+        838,
+        489
+      ],
+      "confidence": 0.1018,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        301,
+        815,
+        329,
+        858
+      ],
+      "confidence": 0.1002,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        559,
+        253,
+        575,
+        276
+      ],
+      "confidence": 0.0963,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        840,
+        258,
+        856,
+        294
+      ],
+      "confidence": 0.096,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        889,
+        495,
+        931,
+        539
+      ],
+      "confidence": 0.0914,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1076,
+        221,
+        1089,
+        242
+      ],
+      "confidence": 0.0889,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        844,
+        261,
+        859,
+        284
+      ],
+      "confidence": 0.0853,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1153,
+        854,
+        1191,
+        909
+      ],
+      "confidence": 0.0844,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        70,
+        749,
+        83,
+        781
+      ],
+      "confidence": 0.0836,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        917,
+        8,
+        932,
+        79
+      ],
+      "confidence": 0.0831,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        732,
+        470,
+        746,
+        488
+      ],
+      "confidence": 0.0831,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        598,
+        309,
+        609,
+        327
+      ],
+      "confidence": 0.0821,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        910,
+        268,
+        925,
+        290
+      ],
+      "confidence": 0.082,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        576,
+        310,
+        594,
+        342
+      ],
+      "confidence": 0.0786,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        667,
+        607,
+        697,
+        640
+      ],
+      "confidence": 0.0737,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        208,
+        727,
+        225,
+        765
+      ],
+      "confidence": 0.0726,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        817,
+        34,
+        830,
+        72
+      ],
+      "confidence": 0.0698,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        888,
+        550,
+        938,
+        617
+      ],
+      "confidence": 0.0666,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        860,
+        164,
+        876,
+        191
+      ],
+      "confidence": 0.0666,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        838,
+        275,
+        853,
+        295
+      ],
+      "confidence": 0.0661,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1235,
+        518,
+        1250,
+        538
+      ],
+      "confidence": 0.0657,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        588,
+        306,
+        598,
+        330
+      ],
+      "confidence": 0.0647,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1057,
+        222,
+        1078,
+        251
+      ],
+      "confidence": 0.0637,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        699,
+        459,
+        731,
+        503
+      ],
+      "confidence": 0.0606,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1210,
+        513,
+        1251,
+        545
+      ],
+      "confidence": 0.0604,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        623,
+        211,
+        645,
+        246
+      ],
+      "confidence": 0.0601,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        553,
+        253,
+        587,
+        284
+      ],
+      "confidence": 0.0581,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        591,
+        308,
+        610,
+        335
+      ],
+      "confidence": 0.0579,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        883,
+        264,
+        914,
+        295
+      ],
+      "confidence": 0.0567,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        724,
+        773,
+        744,
+        805
+      ],
+      "confidence": 0.0551,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        59,
+        752,
+        73,
+        784
+      ],
+      "confidence": 0.0547,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1152,
+        854,
+        1219,
+        925
+      ],
+      "confidence": 0.0539,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        803,
+        455,
+        820,
+        474
+      ],
+      "confidence": 0.0514,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        862,
+        569,
+        882,
+        601
+      ],
+      "confidence": 0.051,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1084,
+        441,
+        1099,
+        468
+      ],
+      "confidence": 0.0507,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        840,
+        467,
+        854,
+        482
+      ],
+      "confidence": 0.0505,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        954,
+        59,
+        970,
+        90
+      ],
+      "confidence": 0.0502,
+      "class": "person"
+    }
+  ]
+}
