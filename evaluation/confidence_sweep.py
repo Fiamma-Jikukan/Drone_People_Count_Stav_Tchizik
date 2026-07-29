@@ -3,7 +3,7 @@
 Takes one low-floor prediction run (a run captured with a low ``--base-conf``) and
 re-applies a range of confidence thresholds to the *saved* detections, recomputing the metrics at
 each — no further model runs. This is exact because SAHI's merge and our NMS are
-greedy by score (see evaluation/ablation_plan.md).
+greedy by score (see evaluation/docs/ablation_plan.md).
 
 Outputs a per-modality sweep table (CSV) and line charts of precision / recall / F1 /
 MAE vs threshold.

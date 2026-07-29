@@ -6,10 +6,10 @@ Run 3 answers the question runs 1–2 could not: **where should the per-modality
 confidence threshold sit, and what does the best thermal operating point actually
 buy us?** It has two parts:
 
-1. **A low-floor confidence sweep** (`sweep/`) — one capture at a confidence floor of
+1. **A low-floor confidence sweep** (`sweep_run/sweep/`) — one capture at a confidence floor of
    **0.05**, then the metrics re-computed at a range of thresholds. This maps the whole
    precision/recall/F1/MAE curve for each modality without re-running the model.
-2. **An operating-point run** (`operating_point/`) — a normal, baseline-faithful run at
+2. **An operating-point run** (`after_sweep_run/`) — a normal, baseline-faithful run at
    the thresholds the sweep recommends (**RGB 0.25 / thermal 0.10**, CLAHE off), scored
    with per-image metrics, plots, and FP/FN example overlays.
 
@@ -40,10 +40,10 @@ every detection down to 0.05 — including the weak thermal ones we want to stud
 | 0.30  | 0.789 | 0.840 | 0.814 | **4.75** | · | 0.927 | 0.237 | 0.378 | 29.75 |
 | 0.35  | 0.808 | 0.802 | 0.805 | 6.50 | · | 0.941 | 0.200 | 0.330 | 31.50 |
 
-![Recall vs threshold](sweep/recall_vs_threshold.png)
-![Precision vs threshold](sweep/precision_vs_threshold.png)
-![F1 vs threshold](sweep/f1_vs_threshold.png)
-![MAE vs threshold](sweep/mae_vs_threshold.png)
+![Recall vs threshold](sweep_run/sweep/recall_vs_threshold.png)
+![Precision vs threshold](sweep_run/sweep/precision_vs_threshold.png)
+![F1 vs threshold](sweep_run/sweep/f1_vs_threshold.png)
+![MAE vs threshold](sweep_run/sweep/mae_vs_threshold.png)
 
 ### What the sweep shows
 
@@ -98,9 +98,9 @@ halved the counting error** (MAE 24.75 → 11.75), at the cost of 20 extra false
 (precision 0.836 → 0.735). For a *counting* task that is a clear win — the undercount was
 the dominant error, and this closes half of it.
 
-![Counts per image](operating_point/results/plots/counts_per_image.png)
-![Detection scores by modality](operating_point/results/plots/detection_scores.png)
-![MAE by modality](operating_point/results/plots/mae.png)
+![Counts per image](after_sweep_run/results/plots/counts_per_image.png)
+![Detection scores by modality](after_sweep_run/results/plots/detection_scores.png)
+![MAE by modality](after_sweep_run/results/plots/mae.png)
 
 ### Per-image thermal breakdown — the failure is image-specific
 
@@ -117,9 +117,9 @@ aggregate thermal recall down. It is the clearest illustration of domain mismatc
 thermal scenes render people in a way the COCO-pretrained model simply does not fire on,
 and no threshold recovers what was never detected.
 
-![0005_T — thermal failure case](operating_point/results/examples/DJI_20260621190900_0005_T.png)
-![0004_T — thermal partial success](operating_point/results/examples/DJI_20260621190747_0004_T.png)
-![0006_V — RGB example](operating_point/results/examples/DJI_20260621190803_0006_V.png)
+![0005_T — thermal failure case](after_sweep_run/results/examples/DJI_20260621190900_0005_T.png)
+![0004_T — thermal partial success](after_sweep_run/results/examples/DJI_20260621190747_0004_T.png)
+![0006_V — RGB example](after_sweep_run/results/examples/DJI_20260621190803_0006_V.png)
 
 *(Overlay key: green box = true positive, red box = false positive, blue point = matched
 ground-truth person, yellow point = missed person.)*
@@ -152,5 +152,5 @@ ground-truth person, yellow point = missed person.)*
 - Thermal remains capped by **precision / domain mismatch**; threshold tuning takes it
   from "mostly misses" to "usable," but a fine-tuned model is needed to go further.
 
-Artefacts: `sweep/` (sweep charts + `sweep.csv`), `operating_point/results/`
+Artefacts: `sweep_run/sweep/` (sweep charts + `sweep.csv`), `after_sweep_run/results/`
 (`summary.json`, `metrics_per_image.csv`, `plots/`, `examples/`).

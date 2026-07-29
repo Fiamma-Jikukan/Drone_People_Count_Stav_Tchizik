@@ -16,5 +16,11 @@ runs/
 # Regenerable ground-truth overlays (the JSON annotations ARE committed)
 ground_truth/review/
 
+# Personal working docs (not submission deliverables)
+answers_documents/presentation_outline.md
+model_arch/
+evaluation/docs/parameters_reference.md
+evaluation/run_predictions.txt
+
 # OS
 .DS_Store

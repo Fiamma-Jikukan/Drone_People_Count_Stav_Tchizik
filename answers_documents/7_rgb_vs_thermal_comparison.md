@@ -15,8 +15,8 @@ This document compares the two modalities (item #7). It builds on the metrics in
   [`evaluation/third_run/run3_analysis.md`](../evaluation/third_run/run3_analysis.md).)
   RGB was more accurate on every pair.
 
-  ![Detection scores by modality — RGB (0.25) vs best thermal (CLAHE off, 0.10)](../evaluation/third_run/operating_point/results/plots/detection_scores.png)
-  ![Mean absolute counting error by modality — RGB (0.25) vs best thermal (CLAHE off, 0.10)](../evaluation/third_run/operating_point/results/plots/mae.png)
+  ![Detection scores by modality — RGB (0.25) vs best thermal (CLAHE off, 0.10)](../evaluation/third_run/after_sweep_run/results/plots/detection_scores.png)
+  ![Mean absolute counting error by modality — RGB (0.25) vs best thermal (CLAHE off, 0.10)](../evaluation/third_run/after_sweep_run/results/plots/mae.png)
 
   *Precision / recall / F1 and MAE per modality, each at its **best** setting. Even so,
   RGB leads on every metric, with roughly half the counting error.*
@@ -35,7 +35,7 @@ This document compares the two modalities (item #7). It builds on the metrics in
   large share of those FNs — the model was under-confident, not blind — but the recovered
   detections bring false positives, so **precision becomes the limiting factor**.
 
-  ![Detection outcomes (TP / FP / FN) by modality — RGB (0.25) vs best thermal (CLAHE off, 0.10)](../evaluation/third_run/operating_point/results/plots/detection_outcomes.png)
+  ![Detection outcomes (TP / FP / FN) by modality — RGB (0.25) vs best thermal (CLAHE off, 0.10)](../evaluation/third_run/after_sweep_run/results/plots/detection_outcomes.png)
 
   *TP / FP / FN per modality at their best settings. Thermal's error is still dominated by
   **false negatives** (missed people), but at the low 0.10 threshold **false positives now

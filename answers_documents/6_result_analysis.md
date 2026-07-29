@@ -66,7 +66,7 @@ under-detection from domain mismatch, not false alarms.*
 ## Effect of confidence / input resolution / IoU / NMS settings
 
 Quantified by the ablation (runs 1–3; full detail in
-[`evaluation/ablation_results.md`](../evaluation/ablation_results.md) and
+[`evaluation/ablation_results.md`](../evaluation/docs/ablation_results.md) and
 [`evaluation/third_run/run3_analysis.md`](../evaluation/third_run/run3_analysis.md)):
 
 - **Confidence — the biggest thermal lever.** A low-floor sweep shows thermal is
@@ -79,8 +79,8 @@ Quantified by the ablation (runs 1–3; full detail in
   the thermal ceiling** (F1 caps ~0.67): recovering recall floods in false positives, so
   tuning makes thermal *usable*, not *good*.
 
-  ![Recall vs confidence threshold (run 3 sweep)](../evaluation/third_run/sweep/recall_vs_threshold.png)
-  ![MAE vs confidence threshold (run 3 sweep)](../evaluation/third_run/sweep/mae_vs_threshold.png)
+  ![Recall vs confidence threshold (run 3 sweep)](../evaluation/third_run/sweep_run/sweep/recall_vs_threshold.png)
+  ![MAE vs confidence threshold (run 3 sweep)](../evaluation/third_run/sweep_run/sweep/mae_vs_threshold.png)
 
   *Confidence sweep (run 3). Left: thermal **recall climbs sharply as the threshold drops** —
   the people are there, just low-scoring. Right: thermal **MAE bottoms out near 0.10** while
@@ -124,7 +124,7 @@ the gap is almost entirely **recall** — thermal misses people rather than inve
   (0.10 roughly halves counting error), but precision — not the threshold — is the wall.
 - **Quantitative ablation done** (runs 1–3): confirmed CLAHE off via a clip × tile grid,
   quantified the confidence effect, and identified the thermal operating point (~0.10).
-  See [`evaluation/ablation_results.md`](../evaluation/ablation_results.md) and
+  See [`evaluation/ablation_results.md`](../evaluation/docs/ablation_results.md) and
   [`evaluation/third_run/run3_analysis.md`](../evaluation/third_run/run3_analysis.md).
   The shipped defaults are kept **conservative** (CLAHE on, thermal 0.20) as the chosen
   baseline; the ablation documents the better operating point rather than changing it.

@@ -119,13 +119,13 @@ baseline-faithful **operating-point run** at the recommended thresholds (RGB 0.2
 thermal 0.10) was scored for inspectable per-image results and FP/FN examples.
 
 ```bash
-python main.py --input evaluation/eval_images --output evaluation/third_run --no-clahe --base-conf 0.05 --rgb-conf 0.05 --thermal-conf 0.05
-python evaluation/confidence_sweep.py --pred-dir evaluation/third_run/json --output evaluation/third_run/sweep --thresholds 0.05 0.075 0.10 0.15 0.20 0.25 0.30 0.35
+python main.py --input evaluation/eval_images --output evaluation/third_run/sweep_run --no-clahe --base-conf 0.05 --rgb-conf 0.05 --thermal-conf 0.05
+python evaluation/confidence_sweep.py --pred-dir evaluation/third_run/sweep_run/json --output evaluation/third_run/sweep_run/sweep --thresholds 0.05 0.075 0.10 0.15 0.20 0.25 0.30 0.35
 ```
 
 **Result.** Thermal is **under-confident, not blind** — lowering thermal to ~0.10 roughly
 halves counting error. Full table, charts, operating-point evaluation, and caveats are in
-[`third_run/run3_analysis.md`](third_run/run3_analysis.md).
+[`third_run/run3_analysis.md`](../third_run/run3_analysis.md).
 
 ---
 

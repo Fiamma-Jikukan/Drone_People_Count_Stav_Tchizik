@@ -32,7 +32,7 @@ load → identify modality (RGB/thermal) → preprocess → detect (YOLO11 + SAH
 | `main.py` | Entry point — runs the pipeline over an image or a directory. |
 | `src/` | The nine pipeline steps, one module each (`loading`, `modality`, `preprocessing`, `detection`, `person_filter`, `filtering`, `counting`, `annotation`, `outputs`). |
 | `ground_truth/` | Point-annotation tool + store + the evaluation sample's ground-truth JSON. |
-| `evaluation/` | Metrics, plotting, evaluation runner, and the ablation (`ablation_results.md`, runs 1–3); baseline results in `evaluation/first_run/results/`. |
+| `evaluation/` | Eval code (`metrics`, `plots`, `evaluate`, sweeps), the 3 runs, and written analysis in `evaluation/docs/` — **start at [`evaluation/README.md`](evaluation/README.md)**. |
 | `answers_documents/` | The written analysis (docs 1–8). |
 | `tests/` | Model-free tests for the core logic (`python -m pytest`). |
 | `input_images/` | Provided RGB (`_V`) + thermal (`_T`) drone image pairs. |
@@ -74,7 +74,7 @@ Key flags: `--weights`, `--device`, `--no-sahi`, `--rgb-conf`, `--thermal-conf`,
 python ground_truth/annotate_points.py --input ground_truth/evaluation_sample.txt
 python ground_truth/render_annotations.py
 
-# Produce predictions for the evaluation set (see evaluation/run_predictions.txt),
+# Produce predictions for the evaluation set,
 # then compute metrics, plots, and FP/FN examples into evaluation/results/
 python main.py --input evaluation/eval_images --output evaluation/predictions --weights yolo11x.pt
 python evaluation/evaluate.py
@@ -138,11 +138,12 @@ threshold to 0.10** roughly **halves thermal counting error**; RGB is unaffected
 The thermal model is **under-confident, not blind** (it fires on ~74 % of thermal people
 at a low threshold), but **precision then caps F1 at ~0.67** — the durable fix is a
 thermal-appropriate model. The defaults ship conservative on purpose; the tuned operating
-point is documented, not baked in. Full analysis:
+point is documented, not baked in. **All runs and both modalities side by side:**
+[`evaluation/results_comparison.md`](evaluation/docs/results_comparison.md). Full analysis:
 [doc 5](answers_documents/5_evaluation_and_analysis.md),
 [doc 6](answers_documents/6_result_analysis.md),
 [doc 7](answers_documents/7_rgb_vs_thermal_comparison.md),
-[`evaluation/ablation_results.md`](evaluation/ablation_results.md),
+[`evaluation/ablation_results.md`](evaluation/docs/ablation_results.md),
 [`evaluation/third_run/run3_analysis.md`](evaluation/third_run/run3_analysis.md).
 
 ## Known limitations and next steps
@@ -151,7 +152,7 @@ point is documented, not baked in. Full analysis:
   a thermal-native detector); lowering the thermal confidence to 0.10 is a **quantified**
   cheap mitigation (≈ halves MAE), but precision is the ceiling.
 - **Quantitative ablation done** (runs 1–3): CLAHE clip/tile grid + confidence sweep +
-  operating-point run — see [`evaluation/ablation_results.md`](evaluation/ablation_results.md).
+  operating-point run — see [`evaluation/ablation_results.md`](evaluation/docs/ablation_results.md).
 - **Small, single-condition sample** (one location, one dusk session): results are
   indicative, not generalisable.
 - Fusion (RGB↔thermal via a fixed homography) is proposed but out of scope

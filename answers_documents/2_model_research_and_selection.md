@@ -135,10 +135,15 @@ result; a tiled head-to-head on the evaluation set would confirm it.*
 ### (e) Support for fine-tuning
 
 - **YOLO11:** **Best-in-class** — one-command training/fine-tuning API, simple YOLO
-  txt dataset format, abundant tutorials; the smoothest route if we later fine-tune
-  on thermal or aerial data.
+  txt dataset format, abundant tutorials. More **sample-efficient** with better
+  small-data tooling (heavy augmentation, one-command recipes) — the smoother on-ramp
+  **when a realistic thermal set exists**.
 - **RT-DETR/RF-DETR:** Fine-tunable, but a **more involved workflow** and slower
-  convergence (transformers are data-hungry) — a poor fit for our tiny dataset.
+  convergence — transformers lack CNNs' built-in inductive biases, so they need
+  **more data** to fine-tune well.
+
+*(Neither is fine-tuned on the 8-image evaluation set — too small for any deep
+detector; see [doc 8](8_finetuning_future_work.md).)*
 
 *Edge: YOLO11.*
 
@@ -156,9 +161,9 @@ result; a tiled head-to-head on the evaluation set would confirm it.*
 
 ### (g) Potential future use in cloud or edge environments
 
-- **YOLO11:** **Strong** — exports to ONNX / TensorRT / CoreML / TFLite, runs on
-  Jetson-class edge devices; SAHI can be toggled off or coarsened for a fast
-  single-pass edge mode, giving a natural accuracy/latency dial.
+- **YOLO11:** **Strong** — exports to the standard cross-platform inference formats and
+  runtimes, and runs on common embedded/edge accelerators; SAHI can be toggled off or
+  coarsened for a fast single-pass edge mode, giving a natural accuracy/latency dial.
 - **RT-DETR/RF-DETR:** Deployable and increasingly edge-friendly, but transformer
   export and latency tuning are **more work** than YOLO's mature toolchain.
 
