@@ -56,19 +56,20 @@ def preprocess(
 
 
 def preprocess_rgb(image_bgr):
-    """RGB preprocessing: guarantee a 3-channel BGR image, otherwise pass through.
+    """RGB preprocessing: guarantee a 3-channel BGR image (pixels unchanged).
 
     Args:
         image_bgr: A BGR or grayscale image array.
 
     Returns:
-        A 3-channel BGR array.
+        A 3-channel BGR array. Always a **fresh array** (never the caller's input
+        aliased), so downstream in-place edits can't corrupt the original frame.
     """
     # A grayscale (2-D) image is promoted to 3 channels so the detector input is uniform.
     if image_bgr.ndim == 2:
         return cv2.cvtColor(image_bgr, cv2.COLOR_GRAY2BGR)
-    # Already 3-channel BGR: nothing to do.
-    return image_bgr
+    # Already 3-channel: return a copy (not the aliased input) to avoid a mutation hazard.
+    return image_bgr.copy()
 
 
 def preprocess_thermal(

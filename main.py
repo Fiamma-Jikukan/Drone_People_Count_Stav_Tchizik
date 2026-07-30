@@ -17,6 +17,11 @@ Examples:
 
     # Faster single-pass (no SAHI tiling) and a tuned thermal threshold
     python main.py --input input_images --no-sahi --thermal-conf 0.15
+
+Exit codes (so batch scripts can detect partial failure):
+    0  every image processed successfully.
+    1  partial failure - some images processed, at least one failed.
+    2  could not complete - bad input, no images found, or every image failed.
 """
 
 # argparse: parse command-line arguments.
@@ -158,6 +163,15 @@ def main(argv=None):
     # Configure basic logging.
     logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-7s | %(message)s", datefmt="%H:%M:%S")
 
+    # Guard the threshold/floor footgun: a per-modality confidence set below --base-conf
+    # has no effect below the floor, because the model never returns detections that weak.
+    for name, conf in (("--rgb-conf", args.rgb_conf), ("--thermal-conf", args.thermal_conf)):
+        if conf < args.base_conf:
+            logger.warning("%s %.3g is below --base-conf %.3g; detections weaker than the "
+                           "floor are never produced, so it has no effect there. "
+                           "Lower --base-conf to actually use this threshold.",
+                           name, conf, args.base_conf)
+
     # Step 1 (discovery): expand the input into a list of image paths.
     try:
         images = discover_images(args.input)
@@ -165,10 +179,10 @@ def main(argv=None):
         # Report a bad input path/type and exit with an error code.
         logger.error("%s", error)
         return 2
-    # Nothing to do if the directory held no supported images.
+    # Nothing to do if the directory held no supported images (could not complete).
     if not images:
         logger.error("No supported images found under: %s", args.input)
-        return 1
+        return 2
 
     # Record the full run configuration (for reproducibility + plot subtitles).
     write_run_config(args)
@@ -199,8 +213,11 @@ def main(argv=None):
     total_people = sum(result["people_count"] for result in results)
     logger.info("Done. %d/%d processed, %d total people, %d failure(s).",
                 len(results), len(images), total_people, failures)
-    # Non-zero exit only if nothing succeeded.
-    return 1 if failures and not results else 0
+    # Exit code reflects how much succeeded (see module docstring):
+    #   0 = all processed, 1 = partial failure, 2 = total failure (nothing produced output).
+    if failures == 0:
+        return 0
+    return 2 if not results else 1
 
 
 # Run main when executed as a script.

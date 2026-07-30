@@ -25,7 +25,8 @@ evaluation/
 ├── confidence_sweep.py        ← re-thresholds a low-floor run (no model re-run)
 ├── clahe_sweep.py             ← re-runs thermal detection over a CLAHE clip×tile grid
 │
-├── eval_images/               ← the 8 evaluation images (4 RGB + 4 thermal)
+│                                (the 8 eval images are listed in ground_truth/evaluation_sample.txt,
+│                                 not duplicated here — main.py accepts that .txt manifest as --input)
 ├── clahe_sweep/               ← output of clahe_sweep.py (clahe_sweep.csv)
 │
 ├── docs/                      ← written analysis & references
@@ -66,7 +67,7 @@ charts are in `third_run/sweep_run/sweep/`. Full explanation:
 
 ```bash
 # 1. Baseline predictions for the 8 evaluation images
-python main.py --input evaluation/eval_images --output evaluation/first_run/predictions --weights yolo11x.pt
+python main.py --input ground_truth/evaluation_sample.txt --output evaluation/first_run/predictions --weights yolo11x.pt
 
 # 2. Score them → metrics, plots, FP/FN examples
 python evaluation/evaluate.py --pred-dir evaluation/first_run/predictions/json --output evaluation/first_run/results

@@ -162,7 +162,7 @@ def _detect_sahi(
         postprocess_match_threshold=merge_iou,
         postprocess_class_agnostic=DEFAULT_POSTPROCESS_CLASS_AGNOSTIC,
         force_postprocess_type=DEFAULT_FORCE_POSTPROCESS_TYPE,
-        verbose=1,
+        verbose=0,  # silence SAHI's raw prints; progress is reported via our logging
     )
 
     # Convert each SAHI object prediction into our detection dict.
@@ -189,7 +189,7 @@ def _detect_single_pass(model, image_bgr, imgsz):
         image_bgr[..., ::-1],
         imgsz=imgsz,
         conf=model.confidence_threshold,
-        verbose=True,
+        verbose=False,  # silence Ultralytics' raw prints; progress is via our logging
     )
 
     # Convert Ultralytics boxes into our detection dicts.

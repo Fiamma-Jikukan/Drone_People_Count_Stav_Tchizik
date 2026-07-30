@@ -70,7 +70,7 @@ Run the model on all 8 evaluation images **without CLAHE**, writing to `second_r
 (same weights and thresholds as the baseline, so CLAHE is the only changed factor):
 
 ```bash
-python main.py --input evaluation/eval_images --output evaluation/second_run --weights yolo11x.pt --no-clahe
+python main.py --input ground_truth/evaluation_sample.txt --output evaluation/second_run --weights yolo11x.pt --no-clahe
 ```
 
 Outputs land in `evaluation/second_run/json/` (for the metrics) and
@@ -121,7 +121,7 @@ baseline-faithful **operating-point run** at the recommended thresholds (RGB 0.2
 thermal 0.075) was scored for inspectable per-image results and FP/FN examples.
 
 ```bash
-python main.py --input evaluation/eval_images --output evaluation/third_run/sweep_run --no-clahe --base-conf 0.05 --rgb-conf 0.05 --thermal-conf 0.05
+python main.py --input ground_truth/evaluation_sample.txt --output evaluation/third_run/sweep_run --no-clahe --base-conf 0.05 --rgb-conf 0.05 --thermal-conf 0.05
 python evaluation/confidence_sweep.py --pred-dir evaluation/third_run/sweep_run/json --output evaluation/third_run/sweep_run/sweep --thresholds 0.05 0.075 0.10 0.15 0.20 0.25 0.30 0.35
 ```
 

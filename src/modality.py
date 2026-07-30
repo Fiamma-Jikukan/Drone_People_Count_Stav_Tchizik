@@ -14,8 +14,13 @@ Two functions:
   * ``infer_modality``     - decide the modality for a given image path.
 """
 
+# logging: warn when a file's modality can't be inferred and we fall back to a default.
+import logging
 # Path: object-oriented filesystem paths (we only inspect the file name here).
 from pathlib import Path
+
+# Module logger (propagates to the root logging config set up by main.py).
+logger = logging.getLogger(__name__)
 
 # Canonical modality names, used across the whole pipeline.
 RGB = "rgb"
@@ -94,5 +99,8 @@ def infer_modality(
         if stem.endswith(suffix.upper()):
             return RGB
 
-    # No recognised suffix: fall back to the configured default (validated).
+    # No recognised suffix: warn (so a mis-named file isn't silently mis-classified)
+    # and fall back to the configured default.
+    logger.warning("No modality suffix (_V/_T) in %r; defaulting to %s. "
+                   "Pass --modality to set it explicitly.", Path(image_path).name, default)
     return normalize_modality(default)

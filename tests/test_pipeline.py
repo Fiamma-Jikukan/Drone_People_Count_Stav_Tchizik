@@ -96,6 +96,25 @@ def test_discover_empty_directory_returns_empty(tmp_path):
     assert discover_images(tmp_path) == []
 
 
+def test_discover_txt_manifest(tmp_path):
+    # A .txt manifest lists image paths (comments/blanks ignored) — no file duplication.
+    img_b = tmp_path / "b_V.jpg"
+    img_a = tmp_path / "a_T.jpg"
+    _write_image(img_b)
+    _write_image(img_a)
+    manifest = tmp_path / "sample.txt"
+    manifest.write_text(f"# a sample\n{img_b}\n\n{img_a}\n", encoding="utf-8")
+    found = [p.name for p in discover_images(manifest)]
+    assert found == ["a_T.jpg", "b_V.jpg"]  # sorted, both resolved
+
+
+def test_discover_manifest_missing_file_raises(tmp_path):
+    manifest = tmp_path / "sample.txt"
+    manifest.write_text(f"{tmp_path / 'ghost_V.jpg'}\n", encoding="utf-8")
+    with pytest.raises(FileNotFoundError):
+        discover_images(manifest)
+
+
 def test_load_image_roundtrip(tmp_path):
     path = tmp_path / "x_V.png"
     _write_image(path, (6, 6, 3))
@@ -156,9 +175,15 @@ def test_normalize_modality_rejects_bad_value():
 # Step 3: preprocessing
 # --------------------------------------------------------------------------
 
-def test_rgb_passthrough_returns_same_array():
+def test_rgb_passthrough_preserves_pixels_without_aliasing():
     image = np.zeros((16, 24, 3), dtype=np.uint8)
-    assert preprocess(image, "rgb") is image  # RGB is a pass-through
+    out = preprocess(image, "rgb")
+    # RGB is a pixel pass-through: same content ...
+    assert np.array_equal(out, image)
+    # ... but a fresh array, so mutating it never corrupts the caller's frame.
+    assert out is not image
+    out[0, 0] = 255
+    assert image[0, 0].sum() == 0
 
 
 def test_thermal_output_is_three_channel():

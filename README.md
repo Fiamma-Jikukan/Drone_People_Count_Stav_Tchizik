@@ -76,7 +76,7 @@ python ground_truth/render_annotations.py
 
 # Produce predictions for the evaluation set,
 # then compute metrics, plots, and FP/FN examples into evaluation/results/
-python main.py --input evaluation/eval_images --output evaluation/predictions --weights yolo11x.pt
+python main.py --input ground_truth/evaluation_sample.txt --output evaluation/predictions --weights yolo11x.pt
 python evaluation/evaluate.py
 
 # Tests

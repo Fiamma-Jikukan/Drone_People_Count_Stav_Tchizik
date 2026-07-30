@@ -26,7 +26,8 @@ def discover_images(input_path, recursive=False):
     """Return a sorted list of image files for a single file or a directory.
 
     Args:
-        input_path: Path to one image file or a directory of images.
+        input_path: Path to one image file, a ``.txt`` manifest (one image path per
+            line; blank lines and ``#`` comments ignored), or a directory of images.
         recursive: If ``True`` and ``input_path`` is a directory, also search
             sub-directories.
 
@@ -35,8 +36,9 @@ def discover_images(input_path, recursive=False):
         contains no supported images.
 
     Raises:
-        FileNotFoundError: if ``input_path`` does not exist.
-        ValueError: if ``input_path`` is a file with an unsupported extension.
+        FileNotFoundError: if ``input_path`` (or a file listed in a manifest) does
+            not exist.
+        ValueError: if a given file has an unsupported extension.
     """
     # Normalize the input into a Path object so we get its helper methods.
     path = Path(input_path)
@@ -45,7 +47,11 @@ def discover_images(input_path, recursive=False):
     if not path.exists():
         raise FileNotFoundError(f"Input path does not exist: {path}")
 
-    # Case 1: the input is a single file.
+    # Case 1: a .txt manifest listing image paths (avoids duplicating the image files).
+    if path.is_file() and path.suffix.lower() == ".txt":
+        return _read_manifest(path)
+
+    # Case 2: the input is a single image file.
     if path.is_file():
         # Reject files whose extension is not a supported image type.
         if path.suffix.lower() not in IMAGE_EXTENSIONS:
@@ -57,7 +63,7 @@ def discover_images(input_path, recursive=False):
         # Return the single valid image wrapped in a one-element list.
         return [path]
 
-    # Case 2: the input is a directory — list entries recursively or top-level only.
+    # Case 3: the input is a directory — list entries recursively or top-level only.
     candidates = path.rglob("*") if recursive else path.glob("*")
     # Keep only image files, sorted for deterministic ordering.
     images = sorted(
@@ -66,6 +72,33 @@ def discover_images(input_path, recursive=False):
     )
     # Return the collected image paths (may be empty).
     return images
+
+
+def _read_manifest(manifest_path):
+    """Read a ``.txt`` manifest of image paths into a sorted list of image Paths.
+
+    One path per line; blank lines and ``#`` comments are ignored. Paths are taken
+    as-is (typically relative to the repo root, so run from there).
+
+    Raises:
+        FileNotFoundError: if a listed file is missing.
+        ValueError: if a listed file has an unsupported extension.
+    """
+    images = []
+    # Walk each non-blank, non-comment line as an image path.
+    for line in Path(manifest_path).read_text(encoding="utf-8").splitlines():
+        entry = line.strip()
+        if not entry or entry.startswith("#"):
+            continue
+        image = Path(entry)
+        # Validate the listed file exists and is a supported image type.
+        if not image.is_file():
+            raise FileNotFoundError(f"Manifest {manifest_path} lists a missing file: {image}")
+        if image.suffix.lower() not in IMAGE_EXTENSIONS:
+            raise ValueError(f"Manifest {manifest_path} lists an unsupported type '{image.suffix}': {image}")
+        images.append(image)
+    # Sort for deterministic ordering, matching the directory case.
+    return sorted(images)
 
 
 def load_image(image_path):
