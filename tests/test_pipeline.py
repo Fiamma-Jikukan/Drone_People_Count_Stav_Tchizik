@@ -529,3 +529,66 @@ def test_evaluate_missing_prediction_raises():
     gt = [_gt("a_V.JPG", "rgb", [[5, 5]])]
     with pytest.raises(KeyError):
         evaluate(gt, [])
+
+
+# --------------------------------------------------------------------------
+# Orchestration: process_image end-to-end (mocked detector)
+# --------------------------------------------------------------------------
+
+def test_process_image_end_to_end_with_mocked_detector(tmp_path, monkeypatch):
+    # Exercises steps 1-9 (load -> modality -> preprocess -> detect -> person
+    # filter -> confidence/NMS -> count -> annotate -> JSON) with the model stubbed.
+    import main
+
+    # A real input image on disk; modality is inferred from the _V suffix -> rgb.
+    img = tmp_path / "scene_0001_V.jpg"
+    _write_image(img, shape=(64, 64, 3))
+    out_dir = tmp_path / "out"
+
+    # Stub the detector to return a fixed set, bypassing the model entirely.
+    fake = [
+        _box_det(4, 4, 20, 24, 0.90),                    # person, kept
+        _box_det(30, 30, 50, 55, 0.50),                  # person, kept (>= rgb 0.25)
+        _box_det(40, 41, 45, 46, 0.10),                  # person, dropped (< 0.25)
+        {"bbox": [10, 10, 25, 25], "confidence": 0.95,   # not a person -> dropped
+         "class_id": 2, "class_name": "car"},
+    ]
+    monkeypatch.setattr(main, "detect", lambda *a, **k: [dict(d) for d in fake])
+
+    args = main.parse_args(["--input", str(img), "--output", str(out_dir)])
+    result = main.process_image(model=object(), image_path=img, args=args)
+
+    # Only the two confident person boxes survive the filter chain.
+    assert result["modality"] == "rgb"
+    assert result["image_name"] == "scene_0001_V.jpg"
+    assert result["people_count"] == 2
+    assert len(result["detections"]) == 2
+    # Output schema keeps bbox/confidence/class only.
+    assert set(result["detections"][0]) == {"bbox", "confidence", "class"}
+
+    # The JSON record was written and matches the returned result.
+    json_path = out_dir / "json" / "scene_0001_V.json"
+    assert json_path.is_file()
+    assert json.loads(json_path.read_text(encoding="utf-8")) == result
+
+    # An annotated image was written and is a decodable 3-channel image.
+    annotated_path = out_dir / "annotated" / "scene_0001_V.jpg"
+    assert annotated_path.is_file()
+    decoded = load_image(annotated_path)
+    assert decoded.ndim == 3 and decoded.shape[2] == 3
+
+
+# --------------------------------------------------------------------------
+# Plots: smoke test that plot_all renders every chart (item #5)
+# --------------------------------------------------------------------------
+
+def test_plot_all_writes_every_chart(tmp_path):
+    from evaluation import plots
+    gt = [_gt("a_V.JPG", "rgb", [[5, 5]]), _gt("a_T.JPG", "thermal", [[5, 5]])]
+    pred = [_pred("a_V.JPG", "rgb", [_box_det(0, 0, 10, 10, 0.9)]), _pred("a_T.JPG", "thermal", [])]
+    results = evaluate(gt, pred)
+    written = plots.plot_all(results, tmp_path / "plots")
+    # All five charts rendered to real PNG files.
+    assert len(written) == 5
+    for path in written:
+        assert path.is_file() and path.suffix == ".png"
