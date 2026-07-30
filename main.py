@@ -35,7 +35,7 @@ from src.modality import infer_modality
 # Step 3: modality-specific preprocessing (import its CLAHE defaults too).
 from src.preprocessing import CLAHE_CLIP_LIMIT, CLAHE_TILE_GRID, preprocess
 # Step 4: build the model and run detection (import its defaults too).
-from src.detection import DEFAULT_BASE_CONFIDENCE, DEFAULT_DEVICE, DEFAULT_WEIGHTS, detect, load_model
+from src.detection import DEFAULT_BASE_CONFIDENCE, DEFAULT_DEVICE, DEFAULT_POSTPROCESS_MATCH_THRESHOLD, DEFAULT_WEIGHTS, detect, load_model
 # Step 5: keep only people.
 from src.person_filter import filter_person
 # Step 6: confidence + NMS filtering (import its default IoU too).
@@ -82,7 +82,11 @@ def parse_args(argv=None):
     # Per-modality confidence thresholds and NMS IoU (the main tuning knobs).
     parser.add_argument("--rgb-conf", type=float, default=DEFAULT_RGB_CONFIDENCE, help="RGB confidence threshold.")
     parser.add_argument("--thermal-conf", type=float, default=DEFAULT_THERMAL_CONFIDENCE, help="Thermal confidence threshold.")
-    parser.add_argument("--nms-iou", type=float, default=DEFAULT_NMS_IOU, help="NMS IoU threshold.")
+    parser.add_argument("--nms-iou", type=float, default=DEFAULT_NMS_IOU, help="Step-6 NMS IoU threshold (secondary de-dup; only bites in --no-sahi).")
+    # SAHI tile-merge overlap threshold (IOS metric) — the PRIMARY de-duplication step
+    # (SAHI only). Distinct from --nms-iou; see process_image for how the two relate.
+    parser.add_argument("--merge-iou", type=float, default=DEFAULT_POSTPROCESS_MATCH_THRESHOLD,
+                        help="SAHI tile-merge overlap threshold (IOS metric); primary de-dup, SAHI only.")
     # Detection floor: the lowest score the model returns at all (below the per-modality
     # thresholds). Lower it to capture weak detections for a confidence sweep.
     parser.add_argument("--base-conf", type=float, default=DEFAULT_BASE_CONFIDENCE, help="Model detection floor.")
@@ -121,11 +125,14 @@ def process_image(model, image_path, args):
     # Step 3: apply modality-specific preprocessing (CLAHE on thermal unless --no-clahe).
     preprocessed = preprocess(image, modality, apply_clahe=not args.no_clahe,
                               clahe_clip_limit=args.clahe_clip, clahe_tile_grid=args.clahe_tile)
-    # Step 4: run detection (SAHI tiled unless --no-sahi).
-    raw = detect(model, preprocessed, use_sahi=not args.no_sahi)
+    # Step 4: run detection (SAHI tiled unless --no-sahi). SAHI's tile-merge (--merge-iou,
+    # IOS metric) is the primary cross-tile de-duplication and happens inside here.
+    raw = detect(model, preprocessed, use_sahi=not args.no_sahi, merge_iou=args.merge_iou)
     # Step 5: keep only detections classified as people.
     people = filter_person(raw)
     # Step 6: drop low-confidence boxes (per modality) and de-duplicate with NMS.
+    # Note: SAHI already merged in step 4; because IOS >= IOU, this secondary IOU-NMS is
+    # inert in tiled mode at the default and only bites in --no-sahi.
     threshold = confidence_for(modality, args.rgb_conf, args.thermal_conf)
     people = filter_detections(people, confidence_threshold=threshold, nms_iou=args.nms_iou)
     # Step 7: the count is the number of surviving detections.

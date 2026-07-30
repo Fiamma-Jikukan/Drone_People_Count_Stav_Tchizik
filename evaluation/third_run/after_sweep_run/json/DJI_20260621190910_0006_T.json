@@ -1,7 +1,7 @@
 {
   "image_name": "DJI_20260621190910_0006_T.JPG",
   "modality": "thermal",
-  "people_count": 53,
+  "people_count": 62,
   "detections": [
     {
       "bbox": [
@@ -35,9 +35,9 @@
     },
     {
       "bbox": [
-        867,
+        856,
         382,
-        886,
+        887,
         416
       ],
       "confidence": 0.477,
@@ -66,9 +66,9 @@
     {
       "bbox": [
         443,
-        412,
-        456,
-        450
+        411,
+        457,
+        451
       ],
       "confidence": 0.4037,
       "class": "person"
@@ -176,9 +176,9 @@
     {
       "bbox": [
         978,
-        379,
-        1000,
-        419
+        371,
+        1002,
+        422
       ],
       "confidence": 0.2873,
       "class": "person"
@@ -336,7 +336,7 @@
     {
       "bbox": [
         808,
-        179,
+        178,
         823,
         202
       ],
@@ -396,19 +396,9 @@
     {
       "bbox": [
         699,
-        476,
+        475,
         723,
         503
-      ],
-      "confidence": 0.1414,
-      "class": "person"
-    },
-    {
-      "bbox": [
-        759,
-        545,
-        800,
-        594
       ],
       "confidence": 0.1414,
       "class": "person"
@@ -455,27 +445,27 @@
     },
     {
       "bbox": [
-        878,
+        877,
         490,
-        908,
-        532
+        931,
+        539
       ],
       "confidence": 0.1299,
       "class": "person"
     },
     {
       "bbox": [
-        872,
+        870,
         167,
         883,
-        192
+        200
       ],
       "confidence": 0.1219,
       "class": "person"
     },
     {
       "bbox": [
-        1077,
+        1075,
         440,
         1100,
         481
@@ -485,10 +475,10 @@
     },
     {
       "bbox": [
-        804,
+        803,
         365,
-        826,
-        391
+        827,
+        402
       ],
       "confidence": 0.1208,
       "class": "person"
@@ -531,6 +521,106 @@
         489
       ],
       "confidence": 0.1018,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        559,
+        253,
+        575,
+        277
+      ],
+      "confidence": 0.0963,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        840,
+        258,
+        859,
+        294
+      ],
+      "confidence": 0.096,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1076,
+        221,
+        1089,
+        242
+      ],
+      "confidence": 0.0889,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        1153,
+        854,
+        1191,
+        909
+      ],
+      "confidence": 0.0844,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        70,
+        749,
+        83,
+        781
+      ],
+      "confidence": 0.0836,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        917,
+        8,
+        932,
+        79
+      ],
+      "confidence": 0.0831,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        731,
+        470,
+        747,
+        496
+      ],
+      "confidence": 0.0831,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        598,
+        309,
+        609,
+        327
+      ],
+      "confidence": 0.0821,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        909,
+        268,
+        926,
+        295
+      ],
+      "confidence": 0.082,
+      "class": "person"
+    },
+    {
+      "bbox": [
+        575,
+        306,
+        602,
+        343
+      ],
+      "confidence": 0.0786,
       "class": "person"
     }
   ]

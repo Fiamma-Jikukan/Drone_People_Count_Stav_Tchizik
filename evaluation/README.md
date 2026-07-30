@@ -47,7 +47,7 @@ thermal 160). Only one factor changes per run.
 |-----|--------|--------------------|---------------|
 | **1 — baseline** | `first_run/` | CLAHE **on**, RGB 0.25 / thermal 0.20 | The shipped default result (RGB F1 0.885 / thermal 0.385). |
 | **2 — CLAHE off** | `second_run/` | CLAHE **off** | CLAHE mildly *hurts* thermal (F1 0.385 → 0.462); RGB unchanged. |
-| **3 — operating point** | `third_run/` | CLAHE off, thermal **0.10** | Lowering the thermal threshold ≈ halves counting error (MAE → 11.75). |
+| **3 — operating point** | `third_run/` | CLAHE off, thermal **0.075** | Lowering the thermal threshold cuts counting error to a quarter (MAE 28 → 7.25). |
 
 Each run folder holds `run_config.json` (the exact parameters), `json/` (per-image
 predictions), `annotated/` (annotated images), and `results/` (metrics CSV, summary,

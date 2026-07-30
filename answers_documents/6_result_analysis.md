@@ -31,7 +31,7 @@ person.*
 
 Thermal is poor at the shipped defaults: **recall 0.25, MAE 28**, and one frame
 (`0005_T`, 25 people) produced **zero detections** — even at the tuned thermal threshold
-(0.10) it recovers only 3 of 25, the clearest domain-mismatch case (see *Effect of
+(0.075) it recovers only 4 of 25, the clearest domain-mismatch case (see *Effect of
 settings* below). All modality-level error is **under-counting** (predicted totals below
 ground truth: RGB 241/263, thermal 48/160).
 
@@ -70,11 +70,11 @@ Quantified by the ablation (runs 1–3; full detail in
 [`evaluation/third_run/run3_analysis.md`](../evaluation/third_run/run3_analysis.md)):
 
 - **Confidence — the biggest thermal lever.** A low-floor sweep shows thermal is
-  *under-confident, not blind*: at a low threshold the model fires on **74 %** of thermal
-  people — they simply score below the 0.20 default. Dropping thermal **0.20 → 0.10**
-  (CLAHE off) roughly **halves counting error (MAE 24.75 → 11.75)** and lifts F1
-  0.46 → 0.61. RGB wants the *opposite* — it is recall-saturated, so a **higher**
-  threshold (~0.25–0.30) is best. The two modalities' optima sit on opposite ends, which
+  *under-confident, not blind*: at a low threshold the model fires on **66 %** of thermal
+  people — they simply score below the 0.20 default. Dropping thermal **0.20 → 0.075**
+  (CLAHE off) roughly **cuts counting error to a third (MAE 24.75 → 7.25)** and lifts F1
+  0.46 → 0.67. RGB wants the *opposite* — it is recall-saturated, so a **higher**
+  threshold (~0.20–0.25) is best. The two modalities' optima sit on opposite ends, which
   is exactly why the pipeline keeps **separate per-modality thresholds**. **Precision is
   the thermal ceiling** (F1 caps ~0.67): recovering recall floods in false positives, so
   tuning makes thermal *usable*, not *good*.
@@ -83,12 +83,12 @@ Quantified by the ablation (runs 1–3; full detail in
   ![MAE vs confidence threshold (run 3 sweep)](../evaluation/third_run/sweep_run/sweep/mae_vs_threshold.png)
 
   *Confidence sweep (run 3). Left: thermal **recall climbs sharply as the threshold drops** —
-  the people are there, just low-scoring. Right: thermal **MAE bottoms out near 0.10** while
-  RGB prefers ~0.25–0.30 — the two modalities want opposite ends of the range.*
-  **Note:** these values come from re-thresholding the low **0.05-floor** capture, where
-  SAHI switches its tile-merge (`NMS/IOU`), so read them for **shape** (where each optimum
-  sits), not absolute values. The faithful absolute numbers are the **operating-point run**
-  (RGB 0.25 / thermal 0.10 → MAE 5.5 / 11.75); see
+  the people are there, just low-scoring. Right: thermal **MAE bottoms out near 0.075** while
+  RGB prefers ~0.20–0.25 — the two modalities want opposite ends of the range.*
+  **Note:** these values come from re-thresholding the **0.05-floor** capture. With SAHI's
+  tile-merge now **pinned** (`src/detection.py`), the sweep closely reproduces a real run at
+  the same threshold (e.g. thermal 0.075 → MAE 7.75 vs the operating-point run's 7.25); it is
+  **near-exact**, not bit-exact. See
   [`evaluation/third_run/run3_analysis.md`](../evaluation/third_run/run3_analysis.md).
 
 - **CLAHE — thermal preprocessing.** A full clip × tile grid was swept: **no CLAHE
@@ -97,15 +97,21 @@ Quantified by the ablation (runs 1–3; full detail in
 - **SAHI / input resolution.** Tiled inference is doing the heavy lifting — without it a
   12 MP frame downscaled to 640 px would lose almost all of these small people (doc 1).
   It is essential to the RGB result. (Decisive qualitatively; not swept numerically.)
-- **NMS IoU (0.5).** A moderate value; too low merges adjacent people in dense clusters
-  (more FN), too high splits individuals (more FP). Its effect concentrates in the dense
-  RGB clusters. (Left as future work — thermal misses are *non-detection*, not
-  over-merging, so NMS is not the thermal bottleneck.)
+- **NMS / tile-merge.** De-duplication happens in **two** places: SAHI's tile-merge
+  (`GREEDYNMM`, **IOS** metric, `--merge-iou 0.5`) removes cross-tile duplicates inside
+  step 4, then step 6 runs a second **IOU** NMS (`--nms-iou 0.5`). Because **IOS ≥ IOU**,
+  the SAHI merge is strictly more aggressive, so at the defaults the step-6 pass is
+  effectively **inert in tiled mode** (nothing overlapping by IOU ≥ 0.5 survives the
+  IOS-0.5 merge) and only bites in `--no-sahi`. The real dense-cluster de-dup knob is
+  therefore **`--merge-iou`**, not `--nms-iou`: **lower** merges adjacent people (more FN
+  in dense clusters), **higher** splits individuals (more FP). (Left as future work —
+  thermal misses are *non-detection*, not over-merging, so neither knob is the thermal
+  bottleneck.)
 
 ## Main difference between RGB and thermal performance
 
 RGB vastly outperforms thermal (**F1 0.885 vs 0.385**, **MAE 5.5 vs 28** at the shipped
-defaults; the thermal ablation narrows it to **F1 0.885 vs 0.61 / MAE 5.5 vs 11.75**,
+defaults; the thermal ablation narrows it to **F1 0.885 vs 0.67 / MAE 5.5 vs 7.25**,
 still a clear RGB win), and the gap is almost entirely **recall** (0.85 vs 0.25), not
 precision (0.93 vs 0.83) — i.e. the thermal model *misses* people rather than inventing
 them. The full comparison, and why, is in [doc 7](7_rgb_vs_thermal_comparison.md).

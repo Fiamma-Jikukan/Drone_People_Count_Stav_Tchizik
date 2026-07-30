@@ -22,12 +22,13 @@ which never changed a single weight. The decision rests on evidence:
   one location, one dusk session — would **overfit** immediately and tell us nothing
   generalisable (doc 4).
 - **RGB is already strong** without training (F1 0.885, MAE 5.5) — no need.
-- **Exhaust the free settings first.** The ablation showed that turning CLAHE off gives
-  a small thermal improvement (MAE 28 → 24.75, F1 0.385 → 0.462) with **no training at
-  all** (ablation_results.md). The correct engineering order is: take the free settings
-  wins, *then* train — and we did.
+- **Exhaust the free settings first.** The ablation showed that the free settings — CLAHE
+  **off** plus lowering the thermal threshold to **0.075** — cut thermal counting error to
+  roughly a quarter (MAE 28 → 7.25) and lifted F1 0.385 → 0.673, with **no training at all**
+  (ablation_results.md, run3_analysis.md). The correct engineering order is: take the free
+  settings wins, *then* train — and we did.
 - **But the ablation also located the ceiling that only training can lift.** Even at its
-  best setting thermal stays far behind RGB, because the COCO-pretrained model has never
+  best setting thermal stays clearly behind RGB, because the COCO-pretrained model has never
   seen `WhiteHot` thermal and only weakly recognises the warm blobs as people (domain
   mismatch — docs 1, 6). No preprocessing or threshold knob can move that curve;
   **fine-tuning is precisely the tool that can.** So fine-tuning is the right *future*
@@ -41,9 +42,9 @@ API, so the plan below is low-friction when data exists (doc 2).
 ## 8.2 When fine-tuning becomes justified (triggers)
 
 - A **labelled in-domain thermal training set** exists (aerial, `WhiteHot`, ~45 m).
-- Thermal performance must exceed the **current best settings** (CLAHE off: thermal
-  F1 ≈ 0.46, MAE ≈ 25) — i.e. higher precision *and* recall together, which no
-  preprocessing or threshold knob can give.
+- Thermal performance must exceed the **current best settings** (CLAHE off, threshold
+  0.075: thermal F1 ≈ 0.67, MAE ≈ 7.25) — i.e. higher precision *and* recall together,
+  which no preprocessing or threshold knob can give.
 - RGB does **not** need it; fine-tuning effort is thermal-only.
 
 ---

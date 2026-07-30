@@ -110,21 +110,23 @@ robust to parameterisation, not an artefact of one setting.
 
 The confidence threshold is applied *after* detection, so it can be swept **without
 re-running the model** per value: capture one run at a low `--base-conf`, then re-apply
-higher thresholds to the saved detections. This is **exact** because both SAHI's tile
-merge and our NMS are greedy by descending score, so filtering the saved detections at
-any threshold T equals running the whole pipeline at T.
+higher thresholds to the saved detections. This is **near-exact**: our NMS and the
+score-ordering make suppression exact, but SAHI's (now pinned) GREEDYNMM *merges*
+overlapping tile boxes, so a lower capture floor feeds the merge marginally more
+candidates. The residual is small — filtering the saved detections at threshold T closely
+reproduces a real run at T (see [`third_run/run3_analysis.md`](../third_run/run3_analysis.md)).
 
 `confidence_sweep.py` was run on a **0.05-floor capture** (CLAHE off), then a
 baseline-faithful **operating-point run** at the recommended thresholds (RGB 0.25 /
-thermal 0.10) was scored for inspectable per-image results and FP/FN examples.
+thermal 0.075) was scored for inspectable per-image results and FP/FN examples.
 
 ```bash
 python main.py --input evaluation/eval_images --output evaluation/third_run/sweep_run --no-clahe --base-conf 0.05 --rgb-conf 0.05 --thermal-conf 0.05
 python evaluation/confidence_sweep.py --pred-dir evaluation/third_run/sweep_run/json --output evaluation/third_run/sweep_run/sweep --thresholds 0.05 0.075 0.10 0.15 0.20 0.25 0.30 0.35
 ```
 
-**Result.** Thermal is **under-confident, not blind** — lowering thermal to ~0.10 roughly
-halves counting error. Full table, charts, operating-point evaluation, and caveats are in
+**Result.** Thermal is **under-confident, not blind** — lowering thermal to ~0.075 cuts
+counting error to a fraction. Full table, charts, operating-point evaluation, and caveats are in
 [`third_run/run3_analysis.md`](../third_run/run3_analysis.md).
 
 ---

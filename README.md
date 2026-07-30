@@ -65,7 +65,7 @@ python main.py --input input_images --no-sahi --thermal-conf 0.15
 ```
 
 Key flags: `--weights`, `--device`, `--no-sahi`, `--rgb-conf`, `--thermal-conf`,
-`--nms-iou`, `--modality`.
+`--merge-iou` (SAHI tile-merge overlap, the primary de-dup), `--nms-iou`, `--modality`.
 
 **Ground-truth annotation & evaluation:**
 
@@ -128,15 +128,15 @@ blobs don't match its learned "person" appearance.
 
 **Ablation** (runs 1–3) shows most of the thermal weakness is a threshold/preprocessing
 artefact, not the model failing to fire. Turning **CLAHE off** and lowering the **thermal
-threshold to 0.10** roughly **halves thermal counting error**; RGB is unaffected:
+threshold to 0.075** **cuts thermal counting error to ~a quarter** (28 → 7.25); RGB is unaffected:
 
 | Modality | MAE | Precision | Recall | F1 |
 |----------|----:|----------:|-------:|---:|
 | **RGB** (0.25) | 5.5 | 0.925 | 0.848 | 0.885 |
-| **Thermal** (CLAHE off, 0.10) | **11.75** | 0.735 | 0.519 | **0.608** |
+| **Thermal** (CLAHE off, 0.075) | **7.25** | 0.730 | 0.625 | **0.673** |
 
-The thermal model is **under-confident, not blind** (it fires on ~74 % of thermal people
-at a low threshold), but **precision then caps F1 at ~0.67** — the durable fix is a
+The thermal model is **under-confident, not blind** (it fires on ~66 % of thermal people
+at a low threshold), but **precision then caps F1 at ~0.68** — the durable fix is a
 thermal-appropriate model. The defaults ship conservative on purpose; the tuned operating
 point is documented, not baked in. **All runs and both modalities side by side:**
 [`evaluation/results_comparison.md`](evaluation/docs/results_comparison.md). Full analysis:

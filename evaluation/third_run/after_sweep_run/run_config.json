@@ -1,6 +1,6 @@
 {
   "input": "evaluation/eval_images",
-  "output": "evaluation/third_run/operating_point",
+  "output": "evaluation/third_run/after_sweep_run",
   "modality": null,
   "weights": "yolo11x.pt",
   "device": "cpu",
@@ -9,7 +9,7 @@
   "clahe_clip": 2.0,
   "clahe_tile": 8,
   "rgb_conf": 0.25,
-  "thermal_conf": 0.1,
+  "thermal_conf": 0.075,
   "nms_iou": 0.5,
-  "base_conf": 0.1
+  "base_conf": 0.075
 }

@@ -38,6 +38,26 @@ DEFAULT_OVERLAP_WIDTH_RATIO = 0.2
 # Inference image size for the single-pass (non-SAHI) fallback.
 DEFAULT_IMGSZ = 1280
 
+# --- SAHI tile-merge (postprocess) parameters — PINNED for reproducibility ---
+# SAHI's get_sliced_prediction otherwise leaves these to library defaults, which are
+# (a) version-dependent and (b) confidence-dependent: at a low confidence floor SAHI
+# silently switches GREEDYNMM/IOS -> NMS/IOU, so the tile-merge changes with the threshold.
+# Pinning them makes the merge explicit and identical across confidence floors, so a
+# low-floor capture and a real run merge the same way. These values match SAHI's normal
+# defaults (what produced all reported results).
+# Greedy non-maximum MERGE of overlapping tile detections (SAHI's standard postprocess).
+DEFAULT_POSTPROCESS_TYPE = "GREEDYNMM"
+# Overlap metric: intersection-over-smaller (robust when tile crops differ in size).
+DEFAULT_POSTPROCESS_MATCH_METRIC = "IOS"
+# Overlap above which two boxes are treated as the same object and merged.
+DEFAULT_POSTPROCESS_MATCH_THRESHOLD = 0.5
+# Merge only within the same class, never across classes.
+DEFAULT_POSTPROCESS_CLASS_AGNOSTIC = False
+# Force the pinned postprocess even at a low confidence floor. Without this, SAHI silently
+# switches to NMS/IOU below confidence 0.1 (its LOW_MODEL_CONFIDENCE) regardless of the
+# postprocess_type we pass — which is exactly the confidence-dependent behaviour we pin away.
+DEFAULT_FORCE_POSTPROCESS_TYPE = True
+
 
 def load_model(
     weights=DEFAULT_WEIGHTS,
@@ -74,6 +94,7 @@ def detect(
     slice_width=DEFAULT_SLICE_WIDTH,
     overlap_height_ratio=DEFAULT_OVERLAP_HEIGHT_RATIO,
     overlap_width_ratio=DEFAULT_OVERLAP_WIDTH_RATIO,
+    merge_iou=DEFAULT_POSTPROCESS_MATCH_THRESHOLD,
     imgsz=DEFAULT_IMGSZ,
 ):
     """Run detection on one preprocessed BGR image and return all detections.
@@ -84,6 +105,8 @@ def detect(
         use_sahi: If True, use SAHI sliced inference; otherwise a single pass.
         slice_height, slice_width: SAHI tile size in pixels.
         overlap_height_ratio, overlap_width_ratio: fractional tile overlap.
+        merge_iou: SAHI tile-merge overlap threshold (IOS metric) for de-duplicating
+            detections across tile seams (the primary de-dup step; SAHI only).
         imgsz: inference size for the single-pass fallback.
 
     Returns:
@@ -95,6 +118,7 @@ def detect(
             model, image_bgr,
             slice_height, slice_width,
             overlap_height_ratio, overlap_width_ratio,
+            merge_iou,
         )
     # Single-pass fallback: faster, but weaker on tiny objects.
     return _detect_single_pass(model, image_bgr, imgsz)
@@ -115,12 +139,17 @@ def _detect_sahi(
     model, image_bgr,
     slice_height, slice_width,
     overlap_height_ratio, overlap_width_ratio,
+    merge_iou=DEFAULT_POSTPROCESS_MATCH_THRESHOLD,
 ):
     """SAHI sliced inference backend."""
     # Import lazily to keep module import cheap.
     from sahi.predict import get_sliced_prediction
 
     # Run tiled prediction; SAHI/Ultralytics expect RGB, so reverse BGR channels.
+    # The postprocess type/metric are pinned explicitly so the merge does not depend on
+    # the confidence floor or the installed SAHI version (see the module constants above);
+    # the overlap threshold is exposed as `merge_iou` (this is the primary de-duplication
+    # step — SAHI's IOS-metric tile-merge).
     result = get_sliced_prediction(
         image_bgr[..., ::-1],
         model,
@@ -128,6 +157,11 @@ def _detect_sahi(
         slice_width=slice_width,
         overlap_height_ratio=overlap_height_ratio,
         overlap_width_ratio=overlap_width_ratio,
+        postprocess_type=DEFAULT_POSTPROCESS_TYPE,
+        postprocess_match_metric=DEFAULT_POSTPROCESS_MATCH_METRIC,
+        postprocess_match_threshold=merge_iou,
+        postprocess_class_agnostic=DEFAULT_POSTPROCESS_CLASS_AGNOSTIC,
+        force_postprocess_type=DEFAULT_FORCE_POSTPROCESS_TYPE,
         verbose=1,
     )
 

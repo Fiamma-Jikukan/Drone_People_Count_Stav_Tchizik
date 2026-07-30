@@ -1,7 +1,7 @@
 {
   "image_name": "DJI_20260621190900_0005_T.JPG",
   "modality": "thermal",
-  "people_count": 7,
+  "people_count": 6,
   "detections": [
     {
       "bbox": [
@@ -16,9 +16,9 @@
     {
       "bbox": [
         98,
-        127,
+        126,
         116,
-        178
+        181
       ],
       "confidence": 0.1461,
       "class": "person"
@@ -55,22 +55,12 @@
     },
     {
       "bbox": [
-        521,
+        497,
         384,
-        547,
-        410
-      ],
-      "confidence": 0.0698,
-      "class": "person"
-    },
-    {
-      "bbox": [
-        507,
-        384,
-        540,
+        552,
         411
       ],
-      "confidence": 0.0585,
+      "confidence": 0.0698,
       "class": "person"
     }
   ]

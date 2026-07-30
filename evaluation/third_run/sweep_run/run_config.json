@@ -1,6 +1,6 @@
 {
   "input": "evaluation/eval_images",
-  "output": "evaluation/third_run",
+  "output": "evaluation/third_run/sweep_run",
   "modality": null,
   "weights": "yolo11x.pt",
   "device": "cpu",
