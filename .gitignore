@@ -16,6 +16,9 @@ venv/
 outputs/
 runs/
 
+# Live-demo scratch (copies of input images + demo outputs; not a deliverable)
+show_run/
+
 # Regenerable ground-truth overlays (the JSON annotations ARE committed)
 ground_truth/review/
 

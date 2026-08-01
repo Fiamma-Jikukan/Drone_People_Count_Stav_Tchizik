@@ -92,12 +92,3 @@ Documented against the fields the assignment lists.
   precision–recall curve shifts up** (higher precision at equal recall), i.e. beating the
   ceiling thresholds cannot move.
 
----
-
-## 8.4 Cheaper experiment to try first
-
-Before a full fine-tune, evaluate an **off-the-shelf thermal-pretrained detector**
-(e.g. FLIR-trained) on the existing 8-image set with the current pipeline. It's a
-one-evening experiment that either gives a quick thermal win or confirms that
-*aerial* thermal is different enough to require in-domain data — informing whether to
-invest in data collection.
